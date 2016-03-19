@@ -1,0 +1,24 @@
+{
+  "name": "mineral",
+  "version": "1.0.0",
+  "description": "A fast jade engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "browserify test/tag-parser.js | tape-run | faucet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voltraco/mineral.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/voltraco/mineral/issues"
+  },
+  "homepage": "https://github.com/voltraco/mineral#readme",
+  "devDependencies": {
+    "json-stringify-safe": "^5.0.1",
+    "tape": "^4.5.1",
+    "tape-run": "^2.1.3"
+  }
+}
