@@ -13,6 +13,19 @@ test('a single tag', assert => {
   assert.end()
 })
 
+test('a single tag with value content', assert => {
+
+  var m = Mineral(`a= foo`)
+
+  var root = m({ foo: 'bar' })
+
+  assert.equal(root.childNodes.length, 1)
+  var a = root.querySelector('a')
+  assert.ok(a)
+  assert.equal(a.textContent, 'bar')
+  assert.end()
+})
+
 test('a single tag with a single string attribute', assert => {
 
   var m = Mineral(`a(data-foo="quxx")`)
@@ -30,6 +43,7 @@ test('a single tag with a single non-string attribute', assert => {
   var m = Mineral(`
     - var x = {}
     - x.foo = 100
+
     a(data-foo= x.foo)
     
   `)

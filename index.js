@@ -38,7 +38,7 @@ function generate(tree) {
 
   function setTextContent(name, v) {
     var val = /\s*=/.test(v) ? v.slice(1) : '"' + v + '"'
-    return name + '.textContent = ' + val 
+    return name + '.textContent = ' + val.replace('\n', '')
   }
 
   function setSourceText(name, v) {
@@ -75,7 +75,7 @@ function generate(tree) {
   }
 
   function startFunction(sig) {
-    return 'function' + sig + ' {'
+    return 'function ' + sig + ' {'
   }
 
   function body(s) {
@@ -90,7 +90,7 @@ function generate(tree) {
   }
 
   function callMixin(node) {
-    var params = '(' + node.sig + ')'
+    var params = '(' + node.signature + ')'
     var call = node.selector.slice(1) + params
     return append(node.parent.id, call)
   }
@@ -113,10 +113,11 @@ function generate(tree) {
 
     s.replace(/[\.|#]?\w+/g, function(v) {
       if (v[0] === '#') {
-        result.tagName = 'div'
+        if (!result.tagName) result.tagName = 'div'
         result.id = v.slice(1)
       }
       else if (v[0] === '.') {
+        if (!result.tagName) result.tagName = 'div'
         result.className += v.slice(1)
       } else {
         result.tagName = v
@@ -170,6 +171,8 @@ function generate(tree) {
 
       if (node.selector === 'each') {
         code.push(createIterator(node))
+      } else if (node.selector === 'if') {
+
       }
 
       return code
@@ -227,13 +230,13 @@ module.exports = function(source, opts) {
 
   function whitespace() { return match(/^\s*/) }
   function signature() { return match(/(\s*\((.*?)\)\.?)?/) }
-  function textContent() { return match(/ ?(.*?)\n/) }
-  function selector() { return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)\.?/) }
+  function textContent() { return match(/(?:\t| )?(.*?)(?:$|[\n\r])/) }
+  function selector() { return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)+\.?/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }
 
-  function peek() { 
-    var next = /^(\s*).*[\n\r]/.exec(source) 
+  function peek() {
+    var next = /^(\s*).*[\n\r]/.exec(source)
     if (next && next[1]) return next[1].length
     return 0
   }
@@ -257,7 +260,7 @@ module.exports = function(source, opts) {
     return (spaces[spaces.length -1] || '').length
   }
 
-  function tag() {
+  function getTag() {
     var w = whitespace()
     var s = selector()
     var sig = signature()
@@ -269,7 +272,7 @@ module.exports = function(source, opts) {
       signature: sig && sig[2],
       children: [],
       isTextBlock: isTextBlock(sig) || isTextBlock(s),
-      textContent: t && t[1]
+      textContent: t && t[0]
     }
   }
 
@@ -306,7 +309,7 @@ module.exports = function(source, opts) {
     var lastNode
     var index = 0
 
-    while (source.length && (node = tag()).selector) {
+    while (source.length && (node = getTag()).selector) {
 
       if (node.selector.indexOf('//') > -1) {
         while (peek() > node.indent) skip()
