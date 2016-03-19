@@ -8,7 +8,9 @@ A small fast jade engine with no dependencies.
 Work in progress!
 
 # USAGE
-Use inline for small snippets
+Use inline for small snippets.
+Mineral returns a function that returns a dom node.
+The function can be stringifyed and cached of course.
 
 ```js
 let min = require('mineral')
@@ -16,9 +18,11 @@ let users = ['beep', 'boop']
 
 let template = min`a(href="/")
   ul
-    each user in ${users}
-      li= user`
+    each name in ${names}
+      li= greeting + name
+`
 
+node.appendChild(template({ greeting: "hello, " }))
 ```
 
 Keep in a separate file
