@@ -7,8 +7,12 @@ A small fast jade engine with no dependencies.
 # STATUS
 Work in progress!
 
+# USAGE
+Use inline for small snippets
+
 ```js
 let min = require('mineral')
+let users = ['beep', 'boop']
 
 let template = min`a(href="/")
   ul
@@ -16,6 +20,8 @@ let template = min`a(href="/")
       li= user`
 
 ```
+
+Keep in a separate file
 
 ```jade
 doctype html
