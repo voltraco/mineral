@@ -147,7 +147,7 @@ function generate(tree) {
 
     if (node.signature) {
       splitAttrs(node.signature).map(function(a) {
-        code.push(setAttr(id, a[0], a[1]))
+        code.push(setAttr(id, a[0].trim(), a[1]))
       })
     }
 
@@ -209,6 +209,22 @@ function generate(tree) {
 
 module.exports = function(source, opts) {
 
+  if (source.raw) {
+    if (!opts) {
+      source = source.raw.join('')
+    } else {
+      var patched = ''
+      var args = [].slice.call(arguments)
+      args.shift()
+      args.forEach(function(arg, i) {
+        patched += source.raw[i]
+        patched += arg
+      })
+      patched += source.raw[source.raw.length - 1]
+      source = patched
+    }
+  }
+
   function whitespace() { return match(/^\s*/) }
   function signature() { return match(/(\s*\((.*?)\)\.?)?/) }
   function textContent() { return match(/ ?(.*?)\n/) }
@@ -257,33 +273,30 @@ module.exports = function(source, opts) {
     }
   }
 
-  function text(node) {
-    var data = {}
-    data.indent = indent(whitespace())
-
-    if (data.indent < node.indent) return null
-
-    var t = textContent()
-
-    if (node.selector === 'script') {
-      data.text = t && t[1]
-    } else {
-      data.textContent = t && t[1]
-    }
-    return data
-  }
-
   function getTextNodes(source, node) {
-    var textNode
+    var textNode = {}
     var lastNode
     var index = 0
 
-    while (source.length && (textNode = text(node))) {
-      if (!textNode) break
-      textNode.parent = node
-      textNode.id = 'v' + (++index) + node.id
-      node.children.push(textNode)
+    while (peek() > node.indent) {
+
+      whitespace()
+      var t = textContent()
+      if (node.selector === 'script') {
+        if (!textNode.text) {
+          textNode.text = ''
+        }
+        textNode.text += t && t[1]
+      } else {
+        if (!textNode.textContent) {
+          textNode.textContent = ''
+        }
+        textNode.textContent += t && t[1]
+      }
     }
+    textNode.parent = node
+    textNode.id = 'v' + (++index) + node.id
+    node.children.push(textNode)
   }
 
   function parse(source) {

@@ -5,8 +5,7 @@ var Mineral = require('../index')
 test('a single comment', assert => {
 
   var m = Mineral('//hello')
-  
-
+  assert.equal(m().childNodes.length, 0)
   assert.end()
 })
 
@@ -30,9 +29,9 @@ test('start with a comment, end with a tag', assert => {
     span
   `)
 
-  document.body.appendChild(m())
-  var b = document.body.querySelector('span')
-  var a = document.body.querySelector('a')
+  var node = m()
+  var b = node.querySelector('span')
+  var a = node.querySelector('a')
 
   assert.equal(b.textContent, '')
   assert.ok(!a)
@@ -49,8 +48,8 @@ test('block comment', assert => {
     b ok
   `)
 
-  document.body.appendChild(m())
-  var b = document.body.querySelector('b')
+  var node = m()
+  var b = node.querySelector('b')
   assert.equal(b.textContent, 'ok')
 
   assert.end()
