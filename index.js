@@ -207,6 +207,7 @@ function generate(tree) {
     return code
   }
 
+
   return body([].concat.apply([], stringify(tree)))
 }
 
@@ -272,7 +273,7 @@ module.exports = function(source, opts) {
       signature: sig && sig[2],
       children: [],
       isTextBlock: isTextBlock(sig) || isTextBlock(s),
-      textContent: t && t[0]
+      textContent: t && t[1]
     }
   }
 
@@ -304,9 +305,15 @@ module.exports = function(source, opts) {
 
   function parse(source) {
 
-    var root
+    var root = {
+      indent: 0,
+      id: 'root',
+      parent: null,
+      children: []
+    }
+
     var node
-    var lastNode
+    var lastNode = root
     var index = 0
 
     while (source.length && (node = getTag()).selector) {
@@ -317,7 +324,7 @@ module.exports = function(source, opts) {
       }
 
       node.id = 'v' + (++index)
-      if (!root) root = node
+      //if (!root) root = node
 
       if (node.isTextBlock) getTextNodes(source, node)
       if (lastNode && (node.indent > lastNode.indent) ) {

@@ -36,21 +36,17 @@ test('mixin with arguments', assert => {
 test('mixin without arguments', assert => {
 
   var m = Mineral(`
-    .people
-      mixin Foo()
-        hr
+    mixin Foo()
+      hr
+
+    h1 hello
 
     each p in [1,2,3]
       +Foo()
 
       `)
 
-  var node = m({
-    people: [
-      { first: 'AF', last: 'AL' },
-      { first: 'BF', last: 'BL' }
-    ]
-  })
+  var node = m()
 
   var hrs = node.querySelectorAll('hr')
 
