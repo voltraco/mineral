@@ -4,8 +4,8 @@ A small fast jade engine with no dependencies.
 - ✓ Works on the server
 - ✓ Works in the browser
 
-# STATUS
-Work in progress!
+# BUILD
+[![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
 
 # USAGE
 Use inline for small snippets.
