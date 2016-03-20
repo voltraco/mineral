@@ -54,6 +54,9 @@ html(lang="en")
 Aside from parsing the jade syntax and generating source text,
 the following control flow features and extras are currently supported...
 
+### CONDITIONALS
+- `if/else-if/else` statements
+
 ### ITERATORS
 - `each` iterate over objects or arrays
 
