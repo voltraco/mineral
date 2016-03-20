@@ -47,7 +47,7 @@ function generate(tree) {
 
   function createIterator(node) {
     var ops = node.textContent.split(/\s+in\s+/)
-    code = []
+    var code = []
 
     if (!eachInstalled) {
       eachInstalled = true
@@ -68,6 +68,32 @@ function generate(tree) {
     code.push(append(node.parent.id, node.id))
     code.push('})', '')
     return code
+  }
+
+  function createCondition(statement, node) {
+    var code = []
+    var test = ''
+    if (node.textContent) {
+      test = ' (' + node.textContent + ')'
+    }
+    code.push(statement + test + ' {')
+    code.push(decl(node.id, createFragment()))
+    code.push(stringify(node.children[0]).join('\n'))
+    code.push(append(node.parent.id, node.id))
+    code.push('}', '')
+    return code
+  }
+
+  function createIfCondition(node) {
+    return createCondition('if', node)
+  }
+
+  function createElseCondition(node) {
+    if (node.textContent.indexOf('if') === 0) {
+      node.textContent = node.textContent.replace(/^if/, '').trim()
+      return createCondition('else if', node)
+    }
+    return createCondition('else', node)
   }
 
   function setId(node, name) {
@@ -172,7 +198,9 @@ function generate(tree) {
       if (node.selector === 'each') {
         code.push(createIterator(node))
       } else if (node.selector === 'if') {
-
+        code.push(createIfCondition(node))
+      } else if (node.selector === 'else') {
+        code.push(createElseCondition(node))
       }
 
       return code
@@ -237,7 +265,7 @@ module.exports = function(source, opts) {
   function skip() { return match(/^.*[\n\r]/) }
 
   function peek() {
-    var next = /^(\s*).*[\n\r]/.exec(source)
+    var next = /^(\s*).*($|[\n\r])/.exec(source)
     if (next && next[1]) return next[1].length
     return 0
   }
@@ -278,29 +306,24 @@ module.exports = function(source, opts) {
   }
 
   function getTextNodes(source, node) {
-    var textNode = {}
-    var lastNode
     var index = 0
 
     while (peek() > node.indent) {
-
       whitespace()
+    
+      var textNode = {}
       var t = textContent()
+
       if (node.selector === 'script') {
-        if (!textNode.text) {
-          textNode.text = ''
-        }
-        textNode.text += t && t[1]
+        textNode.text = t && t[1]
       } else {
-        if (!textNode.textContent) {
-          textNode.textContent = ''
-        }
-        textNode.textContent += t && t[1]
+        textNode.textContent = t && t[1]
       }
+
+      textNode.parent = node
+      textNode.id = 'v' + (++index) + node.id
+      node.children.push(textNode)
     }
-    textNode.parent = node
-    textNode.id = 'v' + (++index) + node.id
-    node.children.push(textNode)
   }
 
   function parse(source) {
@@ -324,7 +347,6 @@ module.exports = function(source, opts) {
       }
 
       node.id = 'v' + (++index)
-      //if (!root) root = node
 
       if (node.isTextBlock) getTextNodes(source, node)
       if (lastNode && (node.indent > lastNode.indent) ) {

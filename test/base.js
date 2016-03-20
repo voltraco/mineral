@@ -54,3 +54,39 @@ test('as a template string with locals', assert => {
   assert.end()
 })
 
+test('hello pug', assert => {
+
+  var m = Mineral(`
+
+    doctype html
+    html(lang="en")
+      head
+        title= pageTitle
+        script(type='text/javascript').
+          if (foo) {
+             bar(1 + 5)
+          }
+      body
+        h1 Jade - node template engine
+        #container.col
+          if youAreUsingJade
+            p You are amazing
+          else
+            p You must be using mineral
+          p.
+            Jade is a terse and simple 
+            templating language with a 
+            strong focus on performance 
+            and powerful features.`)
+
+  var html = `<doctype>html</doctype><html lang="en"><head><title>pugly</title><script type="text/javascript">if (foo) {bar(1 + 5)}</script></head><body><h1>Jade - node template engine</h1><div id="container" class="col"><p>You must be using mineral</p><p>Jade is a terse and simple templating language with a strong focus on performance and powerful features.</p></div></body></html>`
+
+  var node = m({ pageTitle: 'pugly', youAreUsingJade: false })
+  assert.ok(node.childNodes.length, 2)
+
+  var div = document.createElement('div')
+  div.appendChild(node)
+  assert.equal(div.innerHTML, html)
+  assert.end()
+})
+
