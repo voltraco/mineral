@@ -104,15 +104,25 @@ function generate(tree) {
     return 'function ' + sig + ' {'
   }
 
+  var cache = {}
+  
   function body(s) {
-    return new Function('locals', [
-      'locals = locals || {}',
-      decl('root', createFragment()),
-      'with(locals) {',
-        s && s.join('\n'),
-      '}',
-      'return root'
-    ].join('\n'))
+    return function(locals) {
+      var lstr = JSON.stringify(locals)
+      if (cache[lstr]) return cache[lstr]
+
+      var fn = new Function('locals', [
+        'locals = locals || {}',
+        decl('root', createFragment()),
+        'with(locals) {',
+          s && s.join('\n'),
+        '}',
+        'return root'
+      ].join('\n'))
+
+      cache[lstr] = fn(locals)
+      return cache[lstr]
+    }
   }
 
   function callMixin(node) {

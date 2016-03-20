@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "browserify test/*.js | tape-run",
+    "perf": "browserify perf/index.js | tape-run",
     "pretty": "browserify test/*.js | tape-run | faucet"
   },
   "repository": {
@@ -18,8 +19,11 @@
   },
   "homepage": "https://github.com/voltraco/mineral#readme",
   "devDependencies": {
+    "benchmark": "^2.1.0",
     "browserify": "^13.0.0",
+    "domready": "^1.0.8",
     "faucet": "0.0.1",
+    "jade": "^1.11.0",
     "json-stringify-safe": "^5.0.1",
     "tape": "^4.5.1",
     "tape-run": "^2.1.3"
