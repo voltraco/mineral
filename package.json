@@ -4,7 +4,8 @@
   "description": "A fast jade engine",
   "main": "index.js",
   "scripts": {
-    "test": "browserify test/*.js | tape-run | faucet"
+    "test": "browserify test/*.js | tape-run",
+    "pretty": "browserify test/*.js | tape-run | faucet"
   },
   "repository": {
     "type": "git",
