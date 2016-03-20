@@ -15,8 +15,9 @@ Fastest is  [ 'mineral (pre-compiled)' ]
 ```
 
 I haven't started to do any optimiziation stuff yet,
-The main motivation here is jade/pug's size and *massive*
-dependency graph. For now this is a good start.
+The main motivation here is Pug's size and *massive*
+dependency graph. Pug and all its deps are about `102708` LOC
+vs the less than `400` here. LOC For now this is a good start.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
