@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/voltraco/mineral#readme",
   "devDependencies": {
+    "browserify": "^13.0.0",
+    "faucet": "0.0.1",
     "json-stringify-safe": "^5.0.1",
     "tape": "^4.5.1",
     "tape-run": "^2.1.3"
