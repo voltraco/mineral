@@ -1,18 +1,19 @@
 {
   "name": "mineral",
   "version": "2.0.0",
-  "description": "A fast jade engine",
+  "description": "A small and fast jade engine",
   "main": "index.js",
   "scripts": {
-    "test": "browserify test/*.js | tape-run",
-    "perf": "browserify perf/index.js | tape-run",
-    "pretty": "browserify test/*.js | tape-run | faucet"
+    "test": "npm run server && npm run browser",
+    "browser": "browserify test/browser/*.js | tape-run",
+    "server": "node test/server/*.js",
+    "perf": "browserify test/perf/index.js | tape-run"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voltraco/mineral.git"
   },
-  "author": "",
+  "author": "hij1nx",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/voltraco/mineral/issues"

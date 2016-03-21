@@ -1,6 +1,6 @@
 
 var jade = require('jade')
-var min = require('../index')
+var min = require('../../index')
 
 var lodash = document.createElement('script')
 var benchmarkjs = document.createElement('script')
@@ -94,7 +94,7 @@ benchmarkjs.onload = function(event) {
 
   suite.add('mineral (pre-compiled)', function() {
     var node = min_t({ pageTitle: Math.random(), youAreUsingJade: false }) 
-    _a.appendChild = node
+    _a = node
   })
 
   .on('cycle', function(event) {

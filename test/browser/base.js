@@ -1,6 +1,6 @@
 'use strict'
 var test = require('tape')
-var Mineral = require('../index')
+var Mineral = require('../../index')
 
 test('an empty string', assert => {
 

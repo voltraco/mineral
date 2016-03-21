@@ -1,8 +1,8 @@
-
-function generate(tree) {
-
+function generate(tree, opts) {
   var eachInstalled = false
-  var controlflow = ['if', 'else', 'each', 'while', '+', ':']
+  var cache = {}
+  var controlflow = ['if', 'else', 'each', 'while']
+  var contentflow = ['include', 'mixin']
 
   function createElement(type) {
     return 'document.createElement("' + type + '")'
@@ -43,6 +43,14 @@ function generate(tree) {
 
   function setSourceText(name, v) {
     return name + '.text += "' + v + '"'
+  }
+
+  function setId(node, name) {
+    return node + '.id = "' + name + '"'
+  }
+
+  function startFunction(sig) {
+    return 'function ' + sig + ' {'
   }
 
   function createIterator(node) {
@@ -96,33 +104,32 @@ function generate(tree) {
     return createCondition('else', node)
   }
 
-  function setId(node, name) {
-    return node + '.id = "' + name + '"'
-  }
-
-  function startFunction(sig) {
-    return 'function ' + sig + ' {'
-  }
-
-  var cache = {}
-  
   function body(s) {
-    return function(locals) {
+    var fn = new Function('locals', [
+      'locals = locals || {}',
+      decl('root', createFragment()),
+      'with(locals) {',
+        s && s.join('\n'),
+      '}',
+      'return root'
+    ].join('\n'))
+
+    var run = function(locals) {
       var lstr = JSON.stringify(locals)
       if (cache[lstr]) return cache[lstr]
-
-      var fn = new Function('locals', [
-        'locals = locals || {}',
-        decl('root', createFragment()),
-        'with(locals) {',
-          s && s.join('\n'),
-        '}',
-        'return root'
-      ].join('\n'))
-
       cache[lstr] = fn(locals)
       return cache[lstr]
     }
+
+    if (opts.output === 'string') {
+      return [
+        run.toString(),
+        'var cache = {}',
+        'var fn = ' + fn.toString()
+      ].join('\n')
+    }
+
+    return run
   }
 
   function callMixin(node) {
@@ -143,7 +150,6 @@ function generate(tree) {
   }
 
   function tag(s) {
-
     var result = {}
     result.className = ''
 
@@ -244,13 +250,11 @@ function generate(tree) {
     }
     return code
   }
-
-
   return body([].concat.apply([], stringify(tree)))
 }
 
 module.exports = function(source, opts) {
-
+  opts = opts || {}
   if (source.raw) {
     if (!opts) {
       source = source.raw.join('')
@@ -270,9 +274,12 @@ module.exports = function(source, opts) {
   function whitespace() { return match(/^\s*/) }
   function signature() { return match(/(\s*\((.*?)\)\.?)?/) }
   function textContent() { return match(/(?:\t| )?(.*?)(?:$|[\n\r])/) }
-  function selector() { return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)+\.?/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }
+
+  function selector() {
+    return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)+\.?/)
+  }
 
   function peek() {
     var next = /^(\s*).*($|[\n\r])/.exec(source)
@@ -320,7 +327,7 @@ module.exports = function(source, opts) {
 
     while (peek() > node.indent) {
       whitespace()
-    
+
       var textNode = {}
       var t = textContent()
 
@@ -336,7 +343,29 @@ module.exports = function(source, opts) {
     }
   }
 
-  function parse(source) {
+  function includes() {
+    var re = /(?:(\s*)include (.*)($|[\n\r]))/
+    var fs = require('fs')
+    source = source.replace(re, function(_, ws, p) {
+      var indent = ws.length
+      var raw
+
+      try { raw = fs.readFileSync(p) } catch(err) {
+        if (err.name === 'TypeError') {
+          err = new Error('File read not possible')
+        }
+        console.error(err)
+      }
+
+      if (!raw) return ''
+      return raw.toString().split('\n').map(function(line) {
+        return '\n' + Array(indent + 1).join(' ') + line
+      }).join('\n')
+    })
+  }
+
+  function parse() {
+    includes()
 
     var root = {
       indent: 0,
@@ -381,6 +410,7 @@ module.exports = function(source, opts) {
     return root
   }
 
-  return generate(parse(source))
+  if (opts.output === 'ast') return parse(source)
+  return generate(parse(source), opts)
 }
 
