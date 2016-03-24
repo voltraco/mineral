@@ -1,23 +1,23 @@
 # SYNOPSIS
 A small fast jade engine with no dependencies.
 
-- ✓ Works on the server
 - ✓ Works in the browser
+- ✓ Works on the server (use jsdom or minidom)
 - ✓ It's pretty fast...
 
 ```bash
 >browserify perf/index.js | tape-run
-mineral x 3,777 ops/sec ±2.13% (59 runs sampled)
-jade x 119 ops/sec ±4.47% (51 runs sampled)
-jade (pre-compiled) x 4,798 ops/sec ±5.69% (45 runs sampled)
-mineral (pre-compiled) x 8,403 ops/sec ±7.31% (45 runs sampled)
+jade x 105 ops/sec ±4.19% (49 runs sampled)
+mineral x 2,677 ops/sec ±2.84% (18 runs sampled)
+jade (pre-compiled) x 8,926 ops/sec ±2.58% (47 runs sampled)
+mineral (pre-compiled) x 12,662 ops/sec ±6.53% (49 runs sampled)
 Fastest is  [ 'mineral (pre-compiled)' ]
 ```
 
-I haven't started to do any optimiziation stuff yet,
-The main motivation here is Pug's size and *massive*
+There are a ton of optimizations that can happen in this code,
+the main motivation here though is Pug's size and *massive*
 dependency graph. Pug and all its deps are about `102708` LOC
-vs the less than `500` here. Even this code can be reduced.
+vs the less than `500` here.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)

@@ -1,11 +1,10 @@
 function generate(tree, opts) {
   var eachInstalled = false
-  var cache = {}
   var controlflow = ['if', 'else', 'each', 'while']
   var contentflow = ['include', 'mixin']
 
   function createElement(type) {
-    return 'document.createElement("' + type + '")'
+    return 'Element("' + type + '")'
   }
 
   function createTextNode(text) {
@@ -13,11 +12,7 @@ function generate(tree, opts) {
   }
 
   function createFragment() {
-    return 'document.createDocumentFragment()'
-  }
-
-  function valueExpression(name, v) {
-    return name + '.textContent = ' + v.slice(1)
+    return 'Element()'
   }
 
   function decl(lval, rval) {
@@ -36,9 +31,24 @@ function generate(tree, opts) {
     return parent + '.appendChild(' + child + ')'
   }
 
+  function createExpression(s) {
+    return new Function('locals', 'with(locals) {' +
+      'return ' + s + ';' +
+    '}')
+  }
+
+  function wrapWithLocals(s) {
+    return 'with(locals) {' + s + '}'
+  }
+
   function setTextContent(name, v) {
-    var val = /\s*=/.test(v) ? v.slice(1) : '"' + v + '"'
-    return name + '.textContent = ' + val.replace('\n', '')
+    v = v.replace('\n', '')
+
+    if (/\s*=/.test(v)) {
+      var s = name + '.textContent = ' + v.slice(1)
+      return wrapWithLocals(s)
+    }
+    return name + '.textContent = "' + v + '"'
   }
 
   function setSourceText(name, v) {
@@ -53,24 +63,34 @@ function generate(tree, opts) {
     return 'function ' + sig + ' {'
   }
 
+  function Element(name) {
+    if (!name) {
+      name = 'document'
+      cache['document'] = createDocument() 
+    } else if (!cache[name]) {
+      cache[name] = createElement(name) 
+    }
+    return cache[name].cloneNode(false)
+  }
+
+  function Each(o, f) {
+    if (Array.isArray(o)) {
+      for (var i = 0; i < o.length; ++i) {
+        f.call(null, i, o[i]) }
+    } else {
+      for (var k in o) {
+        if (Object.prototype.hasOwnProperty(o, k)) {
+          f.call(null, k, o[k]) 
+        }
+      }
+    }
+  }
+
   function createIterator(node) {
     var ops = node.textContent.split(/\s+in\s+/)
     var code = []
 
-    if (!eachInstalled) {
-      eachInstalled = true
-      code.push('', // hoisted function decl
-        'function __each__(o, f) {',
-          'if (Array.isArray(o)) {',
-            'for (var i = 0; i < o.length; ++i) {',
-              'f.call(null, i, o[i]) }}',
-          'else {',
-            'for (var k in o) {',
-              'if (Object.prototype.hasOwnProperty(o, k)) {',
-                'f.call(null, k, o[k]) }}}}', '')
-    }
-
-    code.push('__each__(' + ops[1] + ', function(' + ops[0] + ') {')
+    code.push('Each(' + ops[1] + ', function(' + ops[0] + ') {')
     code.push(decl(node.id, createFragment()))
     code.push(stringify(node.children[0]).join('\n'))
     code.push(append(node.parent.id, node.id))
@@ -82,7 +102,10 @@ function generate(tree, opts) {
     var code = []
     var test = ''
     if (node.textContent) {
-      test = ' (' + node.textContent + ')'
+      test = '(function() {' + 
+        'with (locals) {' +
+          'return (' + node.textContent + ')' +
+        '}}())'
     }
     code.push(statement + test + ' {')
     code.push(decl(node.id, createFragment()))
@@ -104,32 +127,34 @@ function generate(tree, opts) {
     return createCondition('else', node)
   }
 
-  function body(s) {
-    var fn = new Function('locals', [
-      'locals = locals || {}',
-      decl('root', createFragment()),
-      'with(locals) {',
-        s && s.join('\n'),
-      '}',
-      'return root'
-    ].join('\n'))
+  var cache = {}
+  var noop = function() {}
 
-    var run = function(locals) {
-      var lstr = JSON.stringify(locals)
-      if (cache[lstr]) return cache[lstr]
-      cache[lstr] = fn(locals)
-      return cache[lstr]
+  function body(s) {
+    if (!s) return noop 
+
+    var body = [
+      'var doc = document',
+      'var createDocument = doc.createDocumentFragment.bind(doc)',
+      'var createElement = doc.createElement.bind(doc)',
+      Element.toString(),
+      decl('root', createFragment()),
+      s.join('\n'),
+      'return root'
+    ].join('\n')
+
+    var fn = new Function('locals', 'Each', 'cache', body)
+
+    return function(locals) {
+      return fn(locals, Each, Element)
     }
 
     if (opts.output === 'string') {
       return [
-        run.toString(),
         'var cache = {}',
         'var fn = ' + fn.toString()
       ].join('\n')
     }
-
-    return run
   }
 
   function callMixin(node) {
@@ -200,8 +225,6 @@ function generate(tree, opts) {
 
     return code
   }
-
-  var counter = 0
 
   function stringify(node) {
     if (!node) return
@@ -344,6 +367,8 @@ module.exports = function(source, opts) {
   }
 
   function includes() {
+    if (typeof module === 'undefined') return
+
     var re = /(?:(\s*)include (.*)($|[\n\r]))/
     var fs = require('fs')
     source = source.replace(re, function(_, ws, p) {
@@ -370,9 +395,10 @@ module.exports = function(source, opts) {
     var root = {
       indent: 0,
       id: 'root',
-      parent: null,
       children: []
     }
+
+    root.parent = root
 
     var node
     var lastNode = root

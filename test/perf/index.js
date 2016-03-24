@@ -21,7 +21,7 @@ html(lang="en")
   head
     title= pageTitle
     script(type='text/javascript').
-      if (foo) {
+      if (typeof foo !== 'undefined') {
          bar(1 + 5)
       }
   body
@@ -66,35 +66,46 @@ html(lang="en")
 benchmarkjs.onload = function(event) {
 
   var suite = new Benchmark.Suite
-  
+
   var min_t = min(fixture)
   var jade_t = jade.compile(fixture)
-  console.log(min_t({ pageTitle: Math.random(), youAreUsingJade: false }))
-  console.log(jade_t({ pageTitle: Math.random(), youAreUsingJade: false }))
 
-  var _a = document.createElement('div')
-  var _b = document.createElement('div')
-  document.body.appendChild(_a)
-  document.body.appendChild(_b)
+  var div1 = document.createElement('div')
+  document.body.appendChild(div1)
 
-  suite.add('mineral', function() {
-    var m = min(fixture)
-    var node = m({ pageTitle: 'pugly', youAreUsingJade: false }) 
-  })
+  var div2 = document.createElement('div')
+  document.body.appendChild(div2)
+
+  var div3 = document.createElement('div')
+  document.body.appendChild(div3)
+
+  var div4 = document.createElement('div')
+  document.body.appendChild(div4)
 
   suite.add('jade', function() {
     var m = jade.compile(fixture)
-    var node = m({ pageTitle: 'pugly', youAreUsingJade: false }) 
+    var html = m({ pageTitle: 'pugly', youAreUsingJade: false })
+    var node = document.createElement('div')
+    node.innerHTML = html
+    div1.appendChild(node)
+  })
+
+  suite.add('mineral', function() {
+    var m = min(fixture)
+    var node = m({ pageTitle: 'pugly', youAreUsingJade: false })
+    div2.appendChild(node)
   })
 
   suite.add('jade (pre-compiled)', function() {
-    var node = jade_t({ pageTitle: Math.random(), youAreUsingJade: false }) 
-    _a.innerHTML = node
+    var html = jade_t({ pageTitle: Math.random(), youAreUsingJade: false })
+    var node = document.createElement('div')
+    node.innerHTML = html
+    div3.appendChild(node)
   })
 
   suite.add('mineral (pre-compiled)', function() {
-    var node = min_t({ pageTitle: Math.random(), youAreUsingJade: false }) 
-    _a = node
+    var node = min_t({ pageTitle: Math.random(), youAreUsingJade: false })
+    div4.appendChild(node)
   })
 
   .on('cycle', function(event) {
