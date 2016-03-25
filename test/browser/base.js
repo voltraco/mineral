@@ -55,7 +55,7 @@ test('as a template string with locals', assert => {
   assert.end()
 })
 
-test('text', assert => {
+test('text content', assert => {
 
   var m = Mineral(`
 
@@ -69,13 +69,14 @@ test('text', assert => {
       and powerful features.`)
 
   var node = m()
-  var div = document.createElement('div')
-  div.appendChild(node)
-  console.log(div.innerHTML)
+
+  var longstring = 'Jade is a terse and simple templating language with a strong focus on performance and powerful features.'
+
+  assert.equal(node.querySelector('p:first-of-type').textContent, 'Hello world')
+  assert.equal(node.querySelector('p:last-of-type').textContent, longstring)
 
   assert.end()
 })
-
 
 
 test('hello pug', assert => {

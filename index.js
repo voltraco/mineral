@@ -24,16 +24,22 @@ function setClassName(id, name) {
   return id + '.className = "' + name + '"'
 }
 
-function setAttr(name, k, v) {
-  return name + '.setAttribute("' + k + '", ' + v + ')'
-}
-
 function append(parent, child) {
   return parent + '.appendChild(' + child + ')'
 }
 
 function wrapWithLocals(s) {
   return 'with(locals) {' + s + '}'
+}
+
+function setAttr(name, k, v) {
+  v = v.trim()
+  var s = name + '.setAttribute("' + k + '", ' + v + ')'
+
+  if (!/^['|"\d]/.test(v)) {
+    return wrapWithLocals(s)
+  }
+  return s
 }
 
 function wrapImmediate(s) {
