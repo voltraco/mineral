@@ -1,7 +1,7 @@
 var NL = '\n'
 var noop = function() {}
 var eachInstalled = false
-var controlflow = ['if', 'else', 'each', 'while']
+var controlflow = ['if', 'else', 'each', 'for', 'while']
 var contentflow = ['include', 'mixin']
 
 function createElement(type) {
@@ -206,7 +206,7 @@ function stringify(node) {
 
   if (controlflow.indexOf(node.selector) > -1) {
 
-    if (node.selector === 'each') {
+    if (node.selector === 'each' || node.selector === 'for') {
       code += createIterator(node) + NL
     } else if (node.selector === 'if') {
       code += createIfCondition(node) + NL
@@ -263,6 +263,7 @@ function generate(tree, opts) {
   var fn = new Function('locals', 'Each', 'cache', body)
 
   return function(locals) {
+    locals = locals || {}
     return fn(locals, Each, Element)
   }
 
@@ -276,6 +277,7 @@ function generate(tree, opts) {
 
 module.exports = function(source, opts) {
   opts = opts || {}
+
   if (source.raw) {
     if (!opts) {
       source = source.raw.join('')
