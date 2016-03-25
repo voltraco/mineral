@@ -76,6 +76,27 @@ test('a single tag with multiple attributes', assert => {
   assert.end()
 })
 
+test('a single tag with multiple multi-line attributes', assert => {
+
+  var m = Mineral(`
+    - var x = {}
+    - x.foo = 100
+    a(
+      data-foo= x.foo,
+      name="quxx")
+
+  `)
+
+  var root = m()
+
+  assert.equal(root.childNodes.length, 1)
+  var a = root.querySelector('a')
+  assert.ok(a)
+  assert.equal(a.getAttribute('data-foo'), '100')
+  assert.equal(a.name, 'quxx')
+  assert.end()
+})
+
 test('a single tag with text content', assert => {
 
   var m = Mineral(`

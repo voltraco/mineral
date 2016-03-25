@@ -293,7 +293,7 @@ module.exports = function(source, opts) {
   }
 
   function whitespace() { return match(/^\s*/) }
-  function signature() { return match(/(\s*\((.*?)\)\.?)?/) }
+  function signature() { return match(/(\s*\(\s*((.|\n)*?)\)\.?)?/) }
   function textContent() { return match(/(?:\|\t| )?(.*?)(?:$|[\n\r])/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }
