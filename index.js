@@ -167,6 +167,9 @@ function createNode(id, node) {
   var code = ''
 
   if (!node.selector) { // no tag, attaching textnode to parent
+    if (node.textContent[0] == '|') {
+      node.textContent = node.textContent.replace(/^\|/, '')
+    }
     code += decl(id, createTextNode(node.textContent)) + NL
     return code
   }
@@ -291,11 +294,11 @@ module.exports = function(source, opts) {
 
   function whitespace() { return match(/^\s*/) }
   function signature() { return match(/(\s*\((.*?)\)\.?)?/) }
-  function textContent() { return match(/(?:\t| )?(.*?)(?:$|[\n\r])/) }
+  function textContent() { return match(/(?:\|\t| )?(.*?)(?:$|[\n\r])/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }
 
-  function selector() {
+  function selector() { // TODO move `//`, `-` and `+` to `special()`
     return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)+\.?/)
   }
 
@@ -399,9 +402,9 @@ module.exports = function(source, opts) {
     var lastNode = root
     var index = 0
 
-    while (source.length && (node = getTag()).selector) {
+    while (source.length && (node = getTag())) {
 
-      if (node.selector.indexOf('//') > -1) {
+      if (node.selector && node.selector.indexOf('//') > -1) {
         while (peek() > node.indent) skip()
         continue
       }

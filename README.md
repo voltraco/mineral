@@ -72,21 +72,86 @@ the following control flow features and extras are currently supported...
 ### CONDITIONALS
 - `if/else-if/else` statements
 
-### ITERATORS
-- `each` iterate over objects or arrays
-
 ### SCRIPTING
 - `=` expressions, like `span= obj.val`
 - `-` insert single lines of javascript
 - `script.` insert script tags with content
 
 ### MIXINS
-- `+CallMixin(...)` call mixins
-- `mixin Mixin(...)` declare mixins
 
-### TEXT BLOCKS
-- `tagname.` insert text-blocks
+Create mixins
+
+```jade
+.foo
+mixin Person(firstName, lastName)
+  h1= firstName
+  h2= lastName
+```
+
+Use mixins
+
+```jade
+.person
+  +Person('Jello', 'Biafra')` call mixins
+```
+
+### ITERATORS
+
+Iterate over objects or arrays
+
+```jade
+.people
+  mixin Foo(first, last)
+    .name
+      h1.first= first
+      h2.last= last
+    hr
+
+each p in people
+  +Foo(people[p].first, people[p].last)
+```
+
+```javascript
+var node = min({
+  people: [
+    { first: 'Tom', last: 'Waits' },
+    { first: 'Dick', last: 'Dale' }
+  ]
+})
+```
+
+### TEXT
+
+Multiline textblocks
+
+```jade
+.foo.
+  Hello
+  world.
+```
+
+Single line
+
+```jade
+.foobar
+  | Hello danzig.
+```
 
 ### COMMENTS
-- `//` single and multiline comments
+
+Single-line
+
+```jade
+// single line
+```
+
+Multi-line (`.beep` and `.boop` are commented)
+
+```jade
+.foo1
+//
+  .beep
+    .boop
+.foo2
+```
 
