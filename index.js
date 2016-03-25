@@ -70,7 +70,7 @@ function callMixin(node) {
   return append(node.parent.id, call)
 }
 
-var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^"]*)")|([^, ]*)\s*))?)/g
+var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^\n]*)")|([^, ]*)\s*))?)/g
 var TAG_RE = /[\.|#]?\w+/g
 
 function splitAttrs(str) {
