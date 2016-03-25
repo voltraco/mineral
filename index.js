@@ -1,279 +1,274 @@
-function generate(tree, opts) {
-  var eachInstalled = false
-  var controlflow = ['if', 'else', 'each', 'while']
-  var contentflow = ['include', 'mixin']
+var NL = '\n'
+var noop = function() {}
+var eachInstalled = false
+var controlflow = ['if', 'else', 'each', 'while']
+var contentflow = ['include', 'mixin']
 
-  function createElement(type) {
-    return 'Element("' + type + '")'
+function createElement(type) {
+  return 'Element("' + type + '")'
+}
+
+function createTextNode(text) {
+  return 'document.createTextNode("' + text + '")'
+}
+
+function createFragment() {
+  return 'Element()'
+}
+
+function decl(lval, rval) {
+  return 'var ' + lval + ' = ' + rval
+}
+
+function setClassName(id, name) {
+  return id + '.className = "' + name + '"'
+}
+
+function setAttr(name, k, v) {
+  return name + '.setAttribute("' + k + '", ' + v + ')'
+}
+
+function append(parent, child) {
+  return parent + '.appendChild(' + child + ')'
+}
+
+function wrapWithLocals(s) {
+  return 'with(locals) {' + s + '}'
+}
+
+function wrapImmediate(s) {
+  return ('(function() {' +
+    wrapWithLocals('return ' + s) +
+  '}())')
+}
+
+function setTextContent(name, v) {
+  v = v.replace(NL, '')
+
+  if (/\s*=/.test(v)) {
+    var s = name + '.textContent = ' + v.slice(1)
+    return wrapWithLocals(s)
   }
+  return name + '.textContent = "' + v + '"'
+}
 
-  function createTextNode(text) {
-    return 'document.createTextNode("' + text + '")'
-  }
+function setSourceText(name, v) {
+  return name + '.text += "' + v + '"'
+}
 
-  function createFragment() {
-    return 'Element()'
-  }
+function setId(node, name) {
+  return node + '.id = "' + name + '"'
+}
 
-  function decl(lval, rval) {
-    return 'var ' + lval + ' = ' + rval
-  }
+function startFunction(sig) {
+  return 'function ' + sig + ' {'
+}
 
-  function setClassName(id, name) {
-    return id + '.className = "' + name + '"'
-  }
+function callMixin(node) {
+  var params = '(' + node.signature + ')'
+  var call = node.selector.slice(1) + params
+  return append(node.parent.id, call)
+}
 
-  function setAttr(name, k, v) {
-    return name + '.setAttribute("' + k + '", ' + v + ')'
-  }
+function splitAttrs(str) {
+  var attrs = str.split(',')
 
-  function append(parent, child) {
-    return parent + '.appendChild(' + child + ')'
-  }
+  return attrs.map(function(a) {
+    var sep = a.indexOf('=')
+    return [
+      a.substr(0, sep),
+      a.substr(sep + 1, a.length)]
+  })
+}
 
-  function createExpression(s) {
-    return new Function('locals', 'with(locals) {' +
-      'return ' + s + ';' +
-    '}')
-  }
+function tag(s) {
+  var result = {}
+  result.className = ''
 
-  function wrapWithLocals(s) {
-    return 'with(locals) {' + s + '}'
-  }
-
-  function setTextContent(name, v) {
-    v = v.replace('\n', '')
-
-    if (/\s*=/.test(v)) {
-      var s = name + '.textContent = ' + v.slice(1)
-      return wrapWithLocals(s)
+  s.replace(/[\.|#]?\w+/g, function(v) {
+    if (v[0] === '#') {
+      if (!result.tagName) result.tagName = 'div'
+      result.id = v.slice(1)
     }
-    return name + '.textContent = "' + v + '"'
-  }
-
-  function setSourceText(name, v) {
-    return name + '.text += "' + v + '"'
-  }
-
-  function setId(node, name) {
-    return node + '.id = "' + name + '"'
-  }
-
-  function startFunction(sig) {
-    return 'function ' + sig + ' {'
-  }
-
-  function Element(name) {
-    if (!name) {
-      name = 'document'
-      cache['document'] = createDocument() 
-    } else if (!cache[name]) {
-      cache[name] = createElement(name) 
-    }
-    return cache[name].cloneNode(false)
-  }
-
-  function Each(o, f) {
-    if (Array.isArray(o)) {
-      for (var i = 0; i < o.length; ++i) {
-        f.call(null, i, o[i]) }
+    else if (v[0] === '.') {
+      if (!result.tagName) result.tagName = 'div'
+      result.className += v.slice(1)
     } else {
-      for (var k in o) {
-        if (Object.prototype.hasOwnProperty(o, k)) {
-          f.call(null, k, o[k]) 
-        }
+      result.tagName = v
+    }
+  })
+  return result
+}
+
+function Element(name) {
+  if (!name) {
+    name = 'document'
+    cache['document'] = createDocument()
+  } else if (!cache[name]) {
+    cache[name] = createElement(name)
+  }
+  return cache[name].cloneNode(false)
+}
+
+function Each(o, f) {
+  if (Array.isArray(o)) {
+    for (var i = 0; i < o.length; ++i) {
+      f.call(null, i, o[i]) }
+  } else {
+    for (var k in o) {
+      if (Object.prototype.hasOwnProperty(o, k)) {
+        f.call(null, k, o[k])
       }
     }
   }
+}
 
-  function createIterator(node) {
-    var ops = node.textContent.split(/\s+in\s+/)
-    var code = []
+function createIterator(node) {
+  var ops = node.textContent.split(/\s+in\s+/)
 
-    code.push('Each(' + ops[1] + ', function(' + ops[0] + ') {')
-    code.push(decl(node.id, createFragment()))
-    code.push(stringify(node.children[0]).join('\n'))
-    code.push(append(node.parent.id, node.id))
-    code.push('})', '')
+  return [
+    (!/[\[\{\.]/.test(ops[1]) &&
+    decl(ops[1], wrapImmediate(ops[1]))) || '',
+    'Each(' + ops[1] + ', function(' + ops[0] + ') {',
+    decl(node.id, createFragment()),
+    stringify(node.children[0]),
+    append(node.parent.id, node.id),
+    '})'
+  ].join(NL)
+}
+
+function createCondition(statement, node) {
+  var test = ''
+  if (node.textContent) {
+    test = wrapImmediate(node.textContent)
+  }
+  return [
+    statement + test + ' {',
+    decl(node.id, createFragment()),
+    stringify(node.children[0]),
+    append(node.parent.id, node.id),
+    '}', ''
+  ].join(NL)
+}
+
+function createIfCondition(node) {
+  return createCondition('if', node)
+}
+
+function createElseCondition(node) {
+  if (node.textContent.indexOf('if') === 0) {
+    node.textContent = node.textContent.replace(/^if/, '').trim()
+    return createCondition('else if', node)
+  }
+  return createCondition('else', node)
+}
+
+function createNode(id, node) {
+  var code = ''
+
+  if (!node.selector) { // no tag, attaching textnode to parent
+    code += decl(id, createTextNode(node.textContent)) + NL
     return code
   }
 
-  function createCondition(statement, node) {
-    var code = []
-    var test = ''
-    if (node.textContent) {
-      test = '(function() {' + 
-        'with (locals) {' +
-          'return (' + node.textContent + ')' +
-        '}}())'
+  el = tag(node.selector)
+  code += decl(id, createElement(el.tagName)) + NL
+
+  if (el.id) {
+    code += setId(id, el.id) + NL
+  }
+
+  if (el.className) {
+    code += setClassName(id, el.className) + NL
+  }
+
+  if (node.signature) {
+    splitAttrs(node.signature).map(function(a) {
+      code += setAttr(id, a[0].trim(), a[1]) + NL
+    })
+  }
+
+  if (node.textContent) {
+    code += setTextContent(id, node.textContent) + NL
+  }
+
+  return code
+}
+
+function stringify(node) {
+  var code = ''
+  var parentId = node.parent.id
+
+  if (!node) return code
+
+  if (controlflow.indexOf(node.selector) > -1) {
+
+    if (node.selector === 'each') {
+      code += createIterator(node) + NL
+    } else if (node.selector === 'if') {
+      code += createIfCondition(node) + NL
+    } else if (node.selector === 'else') {
+      code += createElseCondition(node) + NL
     }
-    code.push(statement + test + ' {')
-    code.push(decl(node.id, createFragment()))
-    code.push(stringify(node.children[0]).join('\n'))
-    code.push(append(node.parent.id, node.id))
-    code.push('}', '')
+
     return code
-  }
+  } else if (node.text) {
+    code += setSourceText(node.parent.id, node.text) + NL
+  } else if (node.selector || node.textContent) {
 
-  function createIfCondition(node) {
-    return createCondition('if', node)
-  }
+    if (node.selector && node.selector === 'mixin') {
+      code +=
+        startFunction(node.textContent) + NL +
+        decl(node.id, createFragment()) + NL +
+        stringify(node.children[0]) + NL +
+        'return ' + node.id + NL + '}' + NL
+      return code
 
-  function createElseCondition(node) {
-    if (node.textContent.indexOf('if') === 0) {
-      node.textContent = node.textContent.replace(/^if/, '').trim()
-      return createCondition('else if', node)
+    } else if (node.selector && node.selector[0] === '+') {
+      code += callMixin(node) + NL
+    } else if (node.selector && node.selector[0] === '-') {
+      code += node.textContent + NL
+    } else {
+
+      code += createNode(node.id, node) + NL
+      code += append(parentId, node.id) + NL
     }
-    return createCondition('else', node)
   }
 
+  if (node.children) {
+    for (var i = 0; i < node.children.length; i++) {
+      code += stringify(node.children[i]) + NL
+    }
+  }
+  return code
+}
+
+function generate(tree, opts) {
   var cache = {}
-  var noop = function() {}
+  var content = stringify(tree)
 
-  function body(s) {
-    if (!s) return noop 
+  var body = [
+    'var doc = document',
+    'var createDocument = doc.createDocumentFragment.bind(doc)',
+    'var createElement = doc.createElement.bind(doc)',
+    Element.toString(),
+    decl('root', createFragment()),
+    content,
+    'return root'
+  ].join(NL)
 
-    var body = [
-      'var doc = document',
-      'var createDocument = doc.createDocumentFragment.bind(doc)',
-      'var createElement = doc.createElement.bind(doc)',
-      Element.toString(),
-      decl('root', createFragment()),
-      s.join('\n'),
-      'return root'
-    ].join('\n')
+  var fn = new Function('locals', 'Each', 'cache', body)
 
-    var fn = new Function('locals', 'Each', 'cache', body)
-
-    return function(locals) {
-      return fn(locals, Each, Element)
-    }
-
-    if (opts.output === 'string') {
-      return [
-        'var cache = {}',
-        'var fn = ' + fn.toString()
-      ].join('\n')
-    }
+  return function(locals) {
+    return fn(locals, Each, Element)
   }
 
-  function callMixin(node) {
-    var params = '(' + node.signature + ')'
-    var call = node.selector.slice(1) + params
-    return append(node.parent.id, call)
+  if (opts.output === 'string') {
+    return [
+      'var cache = {}',
+      'var fn = ' + fn.toString()
+    ].join(NL)
   }
-
-  function splitAttrs(str) {
-    var attrs = str.split(',')
-
-    return attrs.map(function(a) {
-      var sep = a.indexOf('=')
-      return [
-        a.substr(0, sep),
-        a.substr(sep + 1, a.length)]
-    })
-  }
-
-  function tag(s) {
-    var result = {}
-    result.className = ''
-
-    s.replace(/[\.|#]?\w+/g, function(v) {
-      if (v[0] === '#') {
-        if (!result.tagName) result.tagName = 'div'
-        result.id = v.slice(1)
-      }
-      else if (v[0] === '.') {
-        if (!result.tagName) result.tagName = 'div'
-        result.className += v.slice(1)
-      } else {
-        result.tagName = v
-      }
-    })
-
-    return result
-  }
-
-  function createNode(id, node) {
-    var code = []
-
-    if (!node.selector) { // no tag, attaching textnode to parent
-      code.push(decl(id, createTextNode(node.textContent)))
-      return code
-    }
-
-    el = tag(node.selector)
-    code.push(decl(id, createElement(el.tagName)))
-
-    if (el.id) {
-      code.push(setId(id, el.id))
-    }
-
-    if (el.className) {
-      code.push(setClassName(id, el.className))
-    }
-
-    if (node.signature) {
-      splitAttrs(node.signature).map(function(a) {
-        code.push(setAttr(id, a[0].trim(), a[1]))
-      })
-    }
-
-    if (node.textContent) {
-      code.push(setTextContent(id, node.textContent))
-    }
-
-    return code
-  }
-
-  function stringify(node) {
-    if (!node) return
-
-    var code = []
-    var parentId = node.parent ? node.parent.id : 'root'
-
-    if (controlflow.indexOf(node.selector) > -1) {
-
-      if (node.selector === 'each') {
-        code.push(createIterator(node))
-      } else if (node.selector === 'if') {
-        code.push(createIfCondition(node))
-      } else if (node.selector === 'else') {
-        code.push(createElseCondition(node))
-      }
-
-      return code
-    } else if (node.text) {
-      code.push(setSourceText(node.parent.id, node.text))
-    } else if (node.selector || node.textContent) {
-
-      if (node.selector && node.selector === 'mixin') {
-        code.push(startFunction(node.textContent))
-        code.push(decl(node.id, createFragment()))
-        code.push(stringify(node.children[0]))
-        code.push('return ' + node.id)
-        code.push('}')
-        return code
-
-      } else if (node.selector && node.selector[0] === '+') {
-        code.push(callMixin(node))
-      } else if (node.selector && node.selector[0] === '-') {
-        code.push(node.textContent)
-      } else {
-
-        code = code.concat(createNode(node.id, node))
-        code.push(append(parentId, node.id))
-      }
-    }
-
-    if (node.children) {
-      for (var i = 0; i < node.children.length; i++) {
-        code = code.concat(stringify(node.children[i]))
-      }
-    }
-    return code
-  }
-  return body([].concat.apply([], stringify(tree)))
 }
 
 module.exports = function(source, opts) {
