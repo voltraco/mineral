@@ -38,6 +38,29 @@ test('a single tag with a single string attribute', assert => {
   assert.end()
 })
 
+test('class with special characters', assert => {
+
+  var m = Mineral(`
+    .foo-bar
+    a.foo-bar
+    a.foo_bar
+    .record-mask
+  `)
+
+  var root = m()
+
+  var a = root.querySelector('div.foo-bar')
+  assert.ok(a)
+  var b = root.querySelector('a.foo-bar')
+  assert.ok(b)
+  var c = root.querySelector('a.foo_bar')
+  assert.ok(c)
+  var d = root.querySelector('.record-mask')
+  assert.ok(d)
+
+  assert.end()
+})
+
 test('a single tag with a single non-string attribute', assert => {
 
   var m = Mineral(`

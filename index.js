@@ -71,7 +71,7 @@ function callMixin(node) {
 }
 
 var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^\n]*)")|([^, ]*)\s*))?)/g
-var TAG_RE = /[\.|#]?\w+/g
+var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
 function splitAttrs(str) {
   var attrs = []
@@ -261,6 +261,7 @@ function generate(tree, opts) {
   ].join(NL)
 
   var fn = new Function('locals', 'Each', 'cache', body)
+
   return function(locals) {
     locals = locals || {}
     return fn(locals, Each, Element)
@@ -321,7 +322,7 @@ module.exports = function(source, opts) {
   function skip() { return match(/^.*[\n\r]/) }
 
   function selector() { // TODO move `//`, `-` and `+` to `special()`
-    return match(/^(?:-?[\/\-\+\.\#_a-zA-Z]+[_a-zA-Z0-9-]*)+\.?/)
+    return match(/^(?:-?[\/\-\+\.\#_a-zA-Z-]+[_a-zA-Z0-9-]*)+\.?/)
   }
 
   function peek() {
