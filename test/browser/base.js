@@ -43,6 +43,7 @@ test('as a template string with locals', assert => {
       span
     h1= hello
     .foo(style="width: ${100}px")
+
   `
 
   var node = m({ hello: 'Quxx!' })

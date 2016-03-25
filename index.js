@@ -70,22 +70,22 @@ function callMixin(node) {
   return append(node.parent.id, call)
 }
 
-function splitAttrs(str) {
-  var attrs = str.split(',')
+var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^"]*)")|([^, ]*)\s*))?)/g
+var TAG_RE = /[\.|#]?\w+/g
 
-  return attrs.map(function(a) {
-    var sep = a.indexOf('=')
-    return [
-      a.substr(0, sep),
-      a.substr(sep + 1, a.length)]
+function splitAttrs(str) {
+  var attrs = []
+  str.replace(ATTR_RE, function(_, key, quoted, unquoted) {
+    attrs.push([key, quoted || unquoted || 'true'])
   })
+  return attrs
 }
 
 function tag(s) {
   var result = {}
   result.className = ''
 
-  s.replace(/[\.|#]?\w+/g, function(v) {
+  s.replace(TAG_RE, function(v) {
     if (v[0] === '#') {
       if (!result.tagName) result.tagName = 'div'
       result.id = v.slice(1)
@@ -261,7 +261,6 @@ function generate(tree, opts) {
   ].join(NL)
 
   var fn = new Function('locals', 'Each', 'cache', body)
-
   return function(locals) {
     locals = locals || {}
     return fn(locals, Each, Element)
@@ -295,7 +294,28 @@ module.exports = function(source, opts) {
   }
 
   function whitespace() { return match(/^\s*/) }
-  function signature() { return match(/(\s*\(\s*((.|\n)*?)\)\.?)?/) }
+
+  function signature() {
+    if (!/^[\t| ]*\(/.test(source)) return ''
+
+    var ch
+    var i = 0
+    var open = 0
+    var value = ''
+    while (ch = source[i++]) {
+      if(ch == '(') ++open
+      if(ch == ')') {
+        open--
+        if (open === 0) {
+          value = source.substr(1, i-2)
+          source = source.slice(i)
+          break
+        }
+      }
+    }
+    return value
+  }
+
   function textContent() { return match(/(?:\|\t| )?(.*?)(?:$|[\n\r])/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }
@@ -318,12 +338,6 @@ module.exports = function(source, opts) {
     return m
   }
 
-  function isTextBlock(match) {
-    var s = match && match[0]
-    if (!s) return false
-    return s[s.length - 1] == '.'
-  }
-
   function indent(w) {
     var spaces = w && w[0].split('\n')
     return (spaces[spaces.length -1] || '').length
@@ -333,14 +347,15 @@ module.exports = function(source, opts) {
     var w = whitespace()
     var s = selector()
     var sig = signature()
+    var text = match(/^\./) || /\.$/.test(s)
     var t = textContent()
 
     return {
       indent: indent(w),
       selector: s && s[0],
-      signature: sig && sig[2],
+      signature: sig,
       children: [],
-      isTextBlock: isTextBlock(sig) || isTextBlock(s),
+      isTextBlock: text,
       textContent: t && t[1]
     }
   }

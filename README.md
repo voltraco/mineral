@@ -70,12 +70,44 @@ Aside from parsing the jade syntax and generating source text,
 the following control flow features and extras are currently supported...
 
 ### CONDITIONALS
-- `if/else-if/else` statements
+Conditional statements
+
+```jade
+if foo
+  p The variable `foo` is truthy
+else if bar
+  p The variable `bar` is truthy
+else
+  p eh, forget about it.
+```
 
 ### SCRIPTING
-- `=` expressions, like `span= obj.val`
-- `-` insert single lines of javascript
-- `script.` insert script tags with content
+
+Script tags
+
+```jade
+  script.
+    var s = 'hello, world'
+    alert(s)
+  h1 I sent you an alert.
+```
+
+Inline scriping
+
+```jade
+  .foo
+    - var x = 100
+    h1= x
+```
+
+Expressions
+
+```jade
+  - var a = 100;
+  - var b = { number: 100 }
+  h1= a + b.number
+  .a(name= 'el' + a)= 'my name is el' + a
+```
 
 ### MIXINS
 
@@ -97,7 +129,7 @@ Use mixins
 
 ### ITERATORS
 
-Iterate over objects or arrays
+Iterate over objects or arrays using `each` or `for`.
 
 ```jade
 .people
