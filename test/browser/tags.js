@@ -115,6 +115,22 @@ test('a single tag with a single non-string attribute from a local', assert => {
   assert.end()
 })
 
+test('inline script uses a local', assert => {
+
+  var m = Mineral(`
+    - var foo = x.foo
+    a(data-foo= foo)
+  `)
+
+  var root = m({ x: { foo: 100 }})
+
+  assert.equal(root.childNodes.length, 1)
+  var a = root.querySelector('a')
+  assert.ok(a)
+  assert.equal(a.getAttribute('data-foo'), '100')
+  assert.end()
+})
+
 test('a single tag with multiple attributes', assert => {
 
   var m = Mineral(`

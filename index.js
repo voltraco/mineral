@@ -240,7 +240,7 @@ function stringify(node) {
     } else if (node.selector && node.selector[0] === '+') {
       code += callMixin(node) + NL
     } else if (node.selector && node.selector[0] === '-') {
-      code += node.textContent + NL
+      code += wrapWithLocals(node.textContent) + NL
     } else {
 
       code += createNode(node.id, node) + NL
