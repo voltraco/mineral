@@ -137,15 +137,14 @@ function Each(o, f) {
 function createIterator(node) {
   var ops = node.textContent.split(/\s+in\s+/)
 
-  return [
-    (!/[\[\{\.]/.test(ops[1]) &&
-    decl(ops[1], wrapImmediate(ops[1]))) || '',
-    'Each(' + ops[1] + ', function(' + ops[0] + ') {',
-    decl(node.id, createFragment()),
-    stringify(node.children[0]),
-    append(node.parent.id, node.id),
+  var each = 
+    'Each(' + ops[1] + ', function(' + ops[0] + ') {' + NL +
+      decl(node.id, createFragment()) + NL +
+      stringify(node.children[0]) + NL +
+      append(node.parent.id, node.id) + NL +
     '})'
-  ].join(NL)
+
+  return wrapWithLocals(each)
 }
 
 function createCondition(statement, node) {

@@ -111,3 +111,25 @@ test('each and for', assert => {
   assert.end()
 })
 
+test('each and for wrapped for locals', assert => {
+
+  var m = Mineral(`
+
+    each num in [1,2,3]
+      h1= num
+
+    for num in foo.bar
+      h2= num
+
+  `)
+
+  var node = m({ foo: { bar: [1,2,3] } })
+  var h1s = node.querySelectorAll('h1')
+  var h2s = node.querySelectorAll('h2')
+
+  assert.equal(h1s.length, 3)
+  assert.equal(h2s.length, 3)
+
+  assert.end()
+})
+
