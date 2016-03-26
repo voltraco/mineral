@@ -13,6 +13,18 @@ test('a single tag', assert => {
   assert.end()
 })
 
+test('a single tag with multiple class names', assert => {
+
+  var m = Mineral(`a.foo.bar.bazz`)
+  var root = m()
+
+  assert.equal(root.childNodes.length, 1)
+  var a = root.querySelector('a')
+  assert.ok(a)
+  assert.ok(a.className, 'foo bar bazz')
+  assert.end()
+})
+
 test('a single tag with value content', assert => {
 
   var m = Mineral(`a= foo`)

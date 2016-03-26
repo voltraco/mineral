@@ -192,7 +192,7 @@ function createNode(id, node) {
   }
 
   if (el.className) {
-    code += setClassName(id, el.className) + NL
+    code += setClassName(id, el.className) + ' ' + NL
   }
 
   if (node.signature) {
