@@ -15,13 +15,13 @@ test('a single tag', assert => {
 
 test('a single tag with multiple class names', assert => {
 
-  var m = Mineral(`a.foo.bar.bazz`)
+  var m = Mineral(`li.item.track`)
   var root = m()
 
   assert.equal(root.childNodes.length, 1)
-  var a = root.querySelector('a')
-  assert.ok(a)
-  assert.ok(a.className, 'foo bar bazz')
+  var li = root.querySelector('li')
+  assert.ok(li)
+  assert.ok(li.className, 'item track')
   assert.end()
 })
 

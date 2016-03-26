@@ -103,7 +103,7 @@ function tag(s) {
     }
     else if (v[0] === '.') {
       if (!result.tagName) result.tagName = 'div'
-      result.className += v.slice(1)
+      result.className += v.slice(1) + ' '
     } else {
       result.tagName = v
     }
@@ -192,7 +192,7 @@ function createNode(id, node) {
   }
 
   if (el.className) {
-    code += setClassName(id, el.className) + ' ' + NL
+    code += setClassName(id, el.className.trim()) + NL
   }
 
   if (node.signature) {
