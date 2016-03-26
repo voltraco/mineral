@@ -124,11 +124,11 @@ function Element(name) {
 function Each(o, f) {
   if (Array.isArray(o)) {
     for (var i = 0; i < o.length; ++i) {
-      f.call(null, i, o[i]) }
+      f.call(null, o[i], i) }
   } else {
     for (var k in o) {
       if (Object.prototype.hasOwnProperty(o, k)) {
-        f.call(null, k, o[k])
+        f.call(null, o[k], k)
       }
     }
   }

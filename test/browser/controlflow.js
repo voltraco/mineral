@@ -115,20 +115,84 @@ test('each and for wrapped for locals', assert => {
 
   var m = Mineral(`
 
-    each num in [1,2,3]
-      h1= num
+    each letter in ['a', 'b', 'c']
+      h1= letter
 
-    for num in foo.bar
-      h2= num
+    for letter in foo.bar
+      h2= letter
 
   `)
 
-  var node = m({ foo: { bar: [1,2,3] } })
+  var node = m({ foo: { bar: ['a', 'b', 'c'] } })
   var h1s = node.querySelectorAll('h1')
   var h2s = node.querySelectorAll('h2')
 
+  assert.equal(h2s[0].textContent, 'a')
+
   assert.equal(h1s.length, 3)
   assert.equal(h2s.length, 3)
+
+  assert.end()
+})
+
+test('each with index', assert => {
+
+  var m = Mineral(`
+    .people
+      mixin Foo(first, last)
+        .name
+          h1.first= first
+          h2.last= last
+        hr
+
+    each p, index in people
+      +Foo(people[index].first, people[index].last)
+
+      `)
+
+  var node = m({
+    people: [
+      { first: 'AF', last: 'AL' },
+      { first: 'BF', last: 'BL' }
+    ]
+  })
+
+  var firstNames = node.querySelectorAll('h1.first')
+  var lastNames = node.querySelectorAll('h2.last')
+
+  assert.equal(firstNames.length, 2)
+  assert.equal(lastNames.length, 2)
+
+  assert.end()
+})
+
+test('each without index', assert => {
+
+  var m = Mineral(`
+    .people
+      mixin Foo(first, last)
+        .name
+          h1.first= first
+          h2.last= last
+        hr
+
+    each p in people
+      +Foo(p.first, p.last)
+
+      `)
+
+  var node = m({
+    people: [
+      { first: 'AF', last: 'AL' },
+      { first: 'BF', last: 'BL' }
+    ]
+  })
+
+  var firstNames = node.querySelectorAll('h1.first')
+  var lastNames = node.querySelectorAll('h2.last')
+
+  assert.equal(firstNames.length, 2)
+  assert.equal(lastNames.length, 2)
 
   assert.end()
 })

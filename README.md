@@ -139,8 +139,11 @@ Iterate over objects or arrays using `each` or `for`.
       h2.last= last
     hr
 
+each p, index in people
+  +Foo(people[index].first, people[index].last)
+
 each p in people
-  +Foo(people[p].first, people[p].last)
+  +Foo(p.first, p.last)
 ```
 
 ```javascript

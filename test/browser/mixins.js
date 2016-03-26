@@ -12,8 +12,8 @@ test('mixin with arguments', assert => {
           h2.last= last
         hr
 
-    each p in people
-      +Foo(people[p].first, people[p].last)
+    each p, index in people
+      +Foo(people[index].first, people[index].last)
 
       `)
 
