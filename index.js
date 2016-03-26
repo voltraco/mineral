@@ -4,6 +4,10 @@ var eachInstalled = false
 var controlflow = ['if', 'else', 'each', 'for', 'while']
 var contentflow = ['include', 'mixin']
 
+var SPLIT_RE = /(?:(?:true|false)|(?:"[^"]+")|(?:'[^']+')|(?:\d*))/
+var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^\n]*)")|([^, ]*)\s*))?)/g
+var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
+
 function createElement(type) {
   return 'Element("' + type + '")'
 }
@@ -32,14 +36,18 @@ function wrapWithLocals(s) {
   return 'with(locals) {' + s + '}'
 }
 
-function setAttr(name, k, v) {
-  v = v.trim()
-  var s = name + '.setAttribute("' + k + '", ' + v + ')'
-
-  if (!/^['|"\d]/.test(v)) {
+function wrapNonPrimitives(s) {
+  var clean = function(a) { return !!a }
+  if (s.split(SPLIT_RE).filter(clean).length) {
     return wrapWithLocals(s)
   }
   return s
+}
+
+function setAttr(name, k, v) {
+  v = v.trim()
+  var s = name + '.setAttribute("' + k + '", ' + v + ')'
+  return wrapNonPrimitives(s)
 }
 
 function wrapImmediate(s) {
@@ -75,9 +83,6 @@ function callMixin(node) {
   var call = node.selector.slice(1) + params
   return append(node.parent.id, call)
 }
-
-var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^\n]*)")|([^, ]*)\s*))?)/g
-var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
 function splitAttrs(str) {
   var attrs = []

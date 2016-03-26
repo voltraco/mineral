@@ -80,6 +80,25 @@ test('a single tag with a single non-string attribute', assert => {
   assert.end()
 })
 
+test('a single tag with a single compound attribute', assert => {
+
+  var m = Mineral(`
+    - var x = {}
+    - x.foo = 100
+
+    a(data-foo= "~" + x.foo + "px")
+    
+  `)
+
+  var root = m()
+
+  assert.equal(root.childNodes.length, 1)
+  var a = root.querySelector('a')
+  assert.ok(a)
+  assert.equal(a.getAttribute('data-foo'), '~100px')
+  assert.end()
+})
+
 test('a single tag with a single non-string attribute from a local', assert => {
 
   var m = Mineral(`
