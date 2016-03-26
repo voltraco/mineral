@@ -167,19 +167,29 @@ test('a single tag with multiple multi-line attributes', assert => {
   var m = Mineral(`
     - var x = {}
     - x.foo = 100
+    - x.bar = 200
+    .c1 OK
     a(
+      name="quxx"
       data-foo= x.foo,
-      name="quxx")
+      data-bar = x.bar)
+      .c2 OK
+      .c3 OK
 
   `)
 
   var root = m()
 
-  assert.equal(root.childNodes.length, 1)
+  assert.equal(root.childNodes.length, 2)
   var a = root.querySelector('a')
   assert.ok(a)
   assert.equal(a.getAttribute('data-foo'), '100')
+  assert.equal(a.getAttribute('data-bar'), '200')
   assert.equal(a.name, 'quxx')
+  assert.ok(root.querySelector('.c1'))
+  assert.ok(root.querySelector('.c2'))
+  assert.ok(root.querySelector('.c3'))
+
   assert.end()
 })
 

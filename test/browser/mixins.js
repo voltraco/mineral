@@ -33,6 +33,31 @@ test('mixin with arguments', assert => {
   assert.end()
 })
 
+
+test('mixin with arguments', assert => {
+
+  var m = Mineral(`
+
+    mixin Play()
+      .play
+      .play-fill
+      .pause
+      .pause-fill
+
+    .foo
+      if true
+        +Play()
+  `)
+
+  var node = m()
+  assert.ok(node.querySelector('.play'))
+  assert.ok(node.querySelector('.play-fill'))
+  assert.ok(node.querySelector('.pause'))
+  assert.ok(node.querySelector('.pause-fill'))
+
+  assert.end()
+})
+
 test('mixin without arguments', assert => {
 
   var m = Mineral(`

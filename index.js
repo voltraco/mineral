@@ -230,11 +230,15 @@ function stringify(node) {
   } else if (node.selector || node.textContent) {
 
     if (node.selector && node.selector === 'mixin') {
-      code +=
-        startFunction(node.textContent) + NL +
-        decl(node.id, createFragment()) + NL +
-        stringify(node.children[0]) + NL +
-        'return ' + node.id + NL + '}' + NL
+      code += startFunction(node.textContent) + NL
+      code += decl(node.id, createFragment()) + NL
+
+      if (node.children) {
+        for (var im = 0; im < node.children.length; im++) {     
+          code += stringify(node.children[im]) + NL
+        }
+      }
+      code += 'return ' + node.id + NL + '}' + NL
       return code
 
     } else if (node.selector && node.selector[0] === '+') {
