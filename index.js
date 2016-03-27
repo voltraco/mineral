@@ -46,7 +46,13 @@ function wrapNonPrimitives(s) {
 
 function setAttr(name, k, v) {
   v = v.trim()
-  var s = name + '.setAttribute("' + k + '", ' + v + ')'
+  var s = ''
+
+  if (k === 'class') {
+    s = name + '.className += " " + (' + v + ')'
+  } else {
+    s = name + '.setAttribute("' + k + '", ' + v + ')'
+  }
   return wrapNonPrimitives(s)
 }
 
@@ -312,7 +318,7 @@ function generate(tree, opts) {
   ].join(NL)
 
   var fn = new Function('locals', 'Each', 'cache', body)
-  
+
   return function(locals) {
     locals = locals || {}
     return fn(locals, Each, Element)
