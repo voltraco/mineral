@@ -17,12 +17,12 @@ test('an empty string', assert => {
 test('as a template literal', assert => {
 
   var username = 'quxx'
-  var m = Mineral`
+  var m = Mineral(`
     // blockcomment
       span
       span
     b ${username}
-  `
+  `)
 
   var node = m()
   var b = node.querySelector('b')
@@ -37,14 +37,14 @@ test('as a template string with locals', assert => {
 
   var username = 'quxx'
 
-  var m = Mineral`
+  var m = Mineral(`
     // blockcomment
       span
       span
     h1= hello
     .foo(style="width: ${100}px")
 
-  `
+  `)
 
   var node = m({ hello: 'Quxx!' })
   var h1 = node.querySelector('h1')
@@ -112,6 +112,18 @@ test('hello pug', assert => {
   var div = document.createElement('div')
   div.appendChild(node)
   assert.equal(div.innerHTML, html)
+  assert.end()
+})
+
+test('entities', assert => {
+
+  var m = Mineral(`
+    p hello &ndash; thanks&sol;ok&sol;goodbye.
+      `)
+
+  var node = m()
+  assert.equal(node.querySelector('p').innerHTML, 'hello – thanks/ok/goodbye.')
+
   assert.end()
 })
 

@@ -69,7 +69,7 @@ function setTextContent(name, v) {
     var s = name + '.textContent = ' + v.slice(1)
     return wrapWithLocals(s)
   }
-  return name + '.textContent = "' + v + '"'
+  return name + '.textContent = Entitify("' + v + '")'
 }
 
 function setSourceText(name, v) {
@@ -136,6 +136,14 @@ function tag(s) {
     }
   })
   return result
+}
+
+function Entitify(s) {
+  var container = document.createElement('div')
+  return s.replace(/&\w+;/g, function(e) {
+    container.innerHTML = e
+    return container.textContent
+  })
 }
 
 function Element(name) {
@@ -317,11 +325,11 @@ function generate(tree, opts) {
     'return root'
   ].join(NL)
 
-  var fn = new Function('locals', 'Each', 'cache', body)
+  var fn = new Function('locals', 'Each', 'Entitify', 'cache', body)
 
   return function(locals) {
     locals = locals || {}
-    return fn(locals, Each, Element)
+    return fn(locals, Each, Entitify, cache)
   }
 
   if (opts.output === 'string') {
@@ -334,24 +342,6 @@ function generate(tree, opts) {
 
 module.exports = function(source, opts) {
   opts = opts || {}
-
-  if (source.raw) {
-    if (!opts) {
-      source = source.raw.join('')
-    } else {
-      var patched = ''
-      var args = [].slice.call(arguments)
-      args.shift()
-      args.forEach(function(arg, i) {
-        patched += source.raw[i]
-        patched += arg
-      })
-      patched += source.raw[source.raw.length - 1]
-      source = patched
-    }
-  }
-
-  function whitespace() { return match(/^\s*/) }
 
   function signature() {
     if (!/^[\t| ]*\(/.test(source)) return ''
@@ -374,6 +364,7 @@ module.exports = function(source, opts) {
     return value
   }
 
+  function whitespace() { return match(/^\s*/) }
   function textContent() { return match(/(?:\|\t| )?(.*?)(?:$|[\n\r])/) }
   function comment() { return match(/^\s*\/\/.*[\n\r]/) }
   function skip() { return match(/^.*[\n\r]/) }

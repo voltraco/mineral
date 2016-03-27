@@ -1,69 +1,20 @@
 # SYNOPSIS
 A small fast jade engine with no dependencies.
 
-- ✓ Works in the browser
-- ✓ Works on the server (use jsdom or minidom... or hell, even pug)
-- ✓ It's not named "pug".
-- ✓ It's fast enough...
-
-```bash
->browserify perf/index.js | tape-run
-jade x 105 ops/sec ±4.19% (49 runs sampled)
-mineral x 2,677 ops/sec ±2.84% (18 runs sampled)
-jade (pre-compiled) x 8,926 ops/sec ±2.58% (47 runs sampled)
-mineral (pre-compiled) x 12,662 ops/sec ±6.53% (49 runs sampled)
-Fastest is  [ 'mineral (pre-compiled)' ]
-```
-
-There are a ton of optimizations that can happen in this code,
-the main motivation here though is Pug's size and *massive*
-dependency graph. Pug and all its deps are about `102708` LOC
-vs the less than `500` here.
-
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
 
 # USAGE
-Use inline for small snippets.
-Mineral returns a function that returns a dom node.
-The function can be stringifyed and cached of course.
-
 ```js
 let min = require('mineral')
 let users = ['beep', 'boop']
 
-let template = min`a(href="/")
+let template = min(`a(href="/")
   ul
     each name in ${names}
-      li= greeting + name
-`
+      li= greeting + name`)
 
 node.appendChild(template({ greeting: "hello, " }))
-```
-
-Keep in a separate file
-
-```jade
-doctype html
-html(lang="en")
-  head
-    title= pageTitle
-    script(type='text/javascript').
-      if (foo) {
-         bar(1 + 5)
-      }
-  body
-    h1 Jade - node template engine
-    #container.col
-      if youAreUsingJade
-        p You are amazing
-      else
-        p Get on it!
-      p.
-        Jade is a terse and simple
-        templating language with a
-        strong focus on performance
-        and powerful features.
 ```
 
 # FEATURES
