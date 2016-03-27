@@ -63,6 +63,34 @@ test('if-else condition', assert => {
   assert.end()
 })
 
+
+test('if-else condition with object access', assert => {
+
+  var m = Mineral(`
+    mixin Foo()
+      h1
+
+    if x.foo
+      p Beep
+        b
+          +Foo()
+    else
+      p Boop
+  `)
+
+  var node
+
+  node = m({ x: { foo: true } })
+  assert.ok(node.querySelector('p'))
+  assert.ok(node.querySelector('p b h1'))
+  assert.ok(node.querySelector('p').textContent === 'Beep')
+  node = m({ x: { foo: false } })
+  assert.ok(node.querySelector('p'))
+  assert.ok(node.querySelector('p').textContent === 'Boop')
+
+  assert.end()
+})
+
 test('if-elseif-else condition', assert => {
 
   var m = Mineral(`
@@ -88,6 +116,25 @@ test('if-elseif-else condition', assert => {
 
   assert.end()
 })
+
+test('if with multiple child nodes', assert => {
+
+  var m = Mineral(`
+
+    if x
+
+      .foo
+      .bazz
+
+  `)
+
+  var node = m({ x: true })
+  var divs = node.querySelectorAll('div')
+  assert.equal(divs.length, 2)
+
+  assert.end()
+})
+
 
 test('each and for', assert => {
 

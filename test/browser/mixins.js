@@ -34,7 +34,7 @@ test('mixin with arguments', assert => {
 })
 
 
-test('mixin with arguments', assert => {
+test('mixin without arguments, multiple child nodes', assert => {
 
   var m = Mineral(`
 
@@ -58,7 +58,7 @@ test('mixin with arguments', assert => {
   assert.end()
 })
 
-test('mixin without arguments', assert => {
+test('mixin without arguments, single child node', assert => {
 
   var m = Mineral(`
     mixin Foo()

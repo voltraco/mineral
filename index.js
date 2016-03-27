@@ -1,11 +1,11 @@
 var NL = '\n'
-var noop = function() {}
-var eachInstalled = false
 var controlflow = ['if', 'else', 'each', 'for', 'while']
 var contentflow = ['include', 'mixin']
 
 var SPLIT_RE = /(?:(?:true|false)|(?:"[^"]+")|(?:'[^']+')|(?:\d*))/
-var ATTR_RE = /(?:\s*([^=\n, ]+)(?:\s*=\s*(?:("(?:[^\n]*)")|([^, ]*)\s*))?)/g
+var VAL_RE = /(?:([^,]*)(?:,|$|[\n\r]))/
+var KEY_RE = /([^\s*,=]+)(\s*,\s*)?/
+var DELIM_RE = /(\s*(,\s*)?)/
 var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
 function createElement(type) {
@@ -86,8 +86,29 @@ function callMixin(node) {
 
 function splitAttrs(str) {
   var attrs = []
-  str.replace(ATTR_RE, function(_, key, quoted, unquoted) {
-    attrs.push([key, quoted || unquoted || 'true'])
+  lines = str.split('\n')
+  lines.map(function(source) {
+
+    function match(re) {
+      var m = re.exec(source)
+      if (!m) return
+      source = source.slice(m[0].length)
+      return m
+    }
+
+    function pair() {
+      var k, v
+      match(DELIM_RE)
+      k = match(KEY_RE)
+      if (k && !k[2]) {
+        match(/(?:\s*=\s*)/)
+        v = match(VAL_RE)
+      }
+      if (!k && !v) return
+      return [k && k[1], (v && v[1]) || 'true']
+    }
+
+    while(p = pair()) attrs.push(p)
   })
   return attrs
 }
@@ -137,14 +158,34 @@ function Each(o, f) {
 function createIterator(node) {
   var ops = node.textContent.split(/\s+in\s+/)
 
-  var each = 
-    'Each(' + ops[1] + ', function(' + ops[0] + ') {' + NL +
-      decl(node.id, createFragment()) + NL +
-      stringify(node.children[0]) + NL +
-      append(node.parent.id, node.id) + NL +
-    '})'
+  var code = ''
+  code += 'Each(' + ops[1] + ', function(' + ops[0] + ') {' + NL
+  code += decl(node.id, createFragment()) + NL
 
-  return wrapWithLocals(each)
+  if (node.children) {
+    for (var im = 0; im < node.children.length; im++) {
+      code += stringify(node.children[im]) + NL
+    }
+  }
+
+  code += append(node.parent.id, node.id) + NL
+  code += '})'
+
+  return wrapWithLocals(code)
+}
+
+function createMixin(node) {
+  var code = ''
+  code += startFunction(node.textContent) + NL
+  code += decl(node.id, createFragment()) + NL
+
+  if (node.children) {
+    for (var im = 0; im < node.children.length; im++) {
+      code += stringify(node.children[im]) + NL
+    }
+  }
+  code += 'return ' + node.id + NL + '}' + NL
+  return code
 }
 
 function createCondition(statement, node) {
@@ -152,13 +193,19 @@ function createCondition(statement, node) {
   if (node.textContent) {
     test = wrapImmediate(node.textContent)
   }
-  return [
-    statement + test + ' {',
-    decl(node.id, createFragment()),
-    stringify(node.children[0]),
-    append(node.parent.id, node.id),
-    '}', ''
-  ].join(NL)
+  var code = ''
+  code += statement + test + ' {' + NL
+  code += decl(node.id, createFragment()) + NL
+
+  if (node.children) {
+    for (var im = 0; im < node.children.length; im++) {
+      code += stringify(node.children[im]) + NL
+    }
+  }
+
+  code += append(node.parent.id, node.id) + NL
+  code += '}' + NL
+  return code
 }
 
 function createIfCondition(node) {
@@ -230,17 +277,7 @@ function stringify(node) {
   } else if (node.selector || node.textContent) {
 
     if (node.selector && node.selector === 'mixin') {
-      code += startFunction(node.textContent) + NL
-      code += decl(node.id, createFragment()) + NL
-
-      if (node.children) {
-        for (var im = 0; im < node.children.length; im++) {     
-          code += stringify(node.children[im]) + NL
-        }
-      }
-      code += 'return ' + node.id + NL + '}' + NL
-      return code
-
+      return code += createMixin(node)
     } else if (node.selector && node.selector[0] === '+') {
       code += callMixin(node) + NL
     } else if (node.selector && node.selector[0] === '-') {
@@ -275,7 +312,7 @@ function generate(tree, opts) {
   ].join(NL)
 
   var fn = new Function('locals', 'Each', 'cache', body)
-
+  
   return function(locals) {
     locals = locals || {}
     return fn(locals, Each, Element)

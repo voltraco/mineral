@@ -2,8 +2,9 @@
 A small fast jade engine with no dependencies.
 
 - ✓ Works in the browser
-- ✓ Works on the server (use jsdom or minidom)
-- ✓ It's pretty fast...
+- ✓ Works on the server (use jsdom or minidom... or hell, even pug)
+- ✓ It's not named "pug".
+- ✓ It's fast enough...
 
 ```bash
 >browserify perf/index.js | tape-run
