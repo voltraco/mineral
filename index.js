@@ -13,7 +13,6 @@ function createElement(type) {
 }
 
 function createTextNode(text) {
-  text = 'Entitify("' + text + '")'
   return 'document.createTextNode(' + text + ')'
 }
 
@@ -38,9 +37,7 @@ function wrapWithLocals(s) {
 }
 
 function wrapImmediate(s) {
-  return ('(function() {' +
-    wrapWithLocals('return ' + s) +
-  '}())')
+  return 'function() { ' + wrapWithLocals('return ' + s) + ' }()'
 }
 
 function wrapNonPrimitives(test, towrap) {
@@ -50,7 +47,7 @@ function wrapNonPrimitives(test, towrap) {
   return towrap
 }
 
-function setAttr(name, k, v) {
+function setAttr(name, k, v, withoutLocals) {
   v = v.trim()
   var s = ''
 
@@ -59,14 +56,16 @@ function setAttr(name, k, v) {
   } else {
     s = name + '.setAttribute("' + k + '", ' + v + ')'
   }
+  if (withoutLocals) return s
   return wrapNonPrimitives(v, s)
 }
 
-function setTextContent(name, v) {
-  v = v.replace(NL, '')
+function setTextContent(name, v, withoutLocals) {
+  v = v.replace(NL, '').replace(/\\([\s\S])|(")/g, '\\$1$2')
 
-  if (/\s*=/.test(v)) {
+  if (/^\s*!?=/.test(v)) {
     v = v.slice(1)
+    if (withoutLocals) return name + '.textContent = ' + v
     return name + '.textContent = ' + wrapImmediate(v)
   }
   return name + '.textContent = Entitify("' + v + '")'
@@ -140,6 +139,7 @@ function tag(s) {
 
 function Entitify(s) {
   var container = document.createElement('div')
+  if (s.indexOf('&') === -1) return s
   return s.replace(/&\w+;/g, function(e) {
     container.innerHTML = e
     return container.textContent
@@ -169,7 +169,7 @@ function Each(o, f) {
   }
 }
 
-function createIterator(node) {
+function createIterator(node, withoutLocals) {
   var ops = node.textContent.split(/\s+in\s+/)
 
   var code = ''
@@ -178,7 +178,7 @@ function createIterator(node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im])
+      code += stringify(node.children[im], withoutLocals)
     }
   }
 
@@ -195,17 +195,17 @@ function createMixin(node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im])
+      code += stringify(node.children[im], true)
     }
   }
   code += 'return ' + node.id + NL + '}' + NL
   return code
 }
 
-function createCondition(statement, node) {
-  var test = ''
-  if (node.textContent) {
-    test = wrapImmediate(node.textContent)
+function createCondition(statement, node, withoutLocals) {
+  var test = node.signature || node.textContent
+  if (test) {
+    test = '(' + (withoutLocals ? test : wrapImmediate(test)) + ')'
   }
   var code = ''
   code += statement + test + ' {' + NL
@@ -213,7 +213,7 @@ function createCondition(statement, node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im])
+      code += stringify(node.children[im], withoutLocals)
     }
   }
 
@@ -222,25 +222,32 @@ function createCondition(statement, node) {
   return code
 }
 
-function createIfCondition(node) {
-  return createCondition('if', node)
+function createIfCondition(node, withoutLocals) {
+  return createCondition('if', node, withoutLocals)
 }
 
-function createElseCondition(node) {
+function createElseCondition(node, withoutLocals) {
   if (node.textContent.indexOf('if') === 0) {
     node.textContent = node.textContent.replace(/^if/, '').trim()
-    return createCondition('else if', node)
+    return createCondition('else if', node, withoutLocals)
   }
-  return createCondition('else', node)
+  return createCondition('else', node, withoutLocals)
 }
 
-function createNode(id, node) {
+function createNode(id, node, withoutLocals) {
   var code = ''
 
   if (!node.selector) { // no tag, attaching textnode to parent
     if (node.textContent[0] == '|') {
       node.textContent = node.textContent.replace(/^\|/, '')
+    } else if (node.textContent[0] == '!') {
+      var text = node.textContent.replace(/^!= /, '') + NL
+      code += decl('content_' + id, wrapImmediate(text)) + NL
+      code += decl(id, createTextNode('content_' + id)) + NL
+      return code
     }
+
+    node.textContent = 'Entitify("' + node.textContent + '")'
     code += decl(id, createTextNode(node.textContent)) + NL
     return code
   }
@@ -258,18 +265,18 @@ function createNode(id, node) {
 
   if (node.signature) {
     splitAttrs(node.signature).map(function(a) {
-      code += setAttr(id, a[0].trim(), a[1]) + NL
+      code += setAttr(id, a[0].trim(), a[1], withoutLocals) + NL
     })
   }
 
   if (node.textContent) {
-    code += setTextContent(id, node.textContent) + NL
+    code += setTextContent(id, node.textContent, withoutLocals) + NL
   }
 
   return code
 }
 
-function stringify(node) {
+function stringify(node, withoutLocals) {
   var code = ''
   var parentId = node.parent.id
 
@@ -278,11 +285,11 @@ function stringify(node) {
   if (controlflow.indexOf(node.selector) > -1) {
 
     if (node.selector === 'each' || node.selector === 'for') {
-      code += createIterator(node) + NL
+      code += createIterator(node, withoutLocals) + NL
     } else if (node.selector === 'if') {
-      code += createIfCondition(node) + NL
+      code += createIfCondition(node, withoutLocals) + NL
     } else if (node.selector === 'else') {
-      code += createElseCondition(node) + NL
+      code += createElseCondition(node, withoutLocals) + NL
     }
 
     return code
@@ -291,21 +298,25 @@ function stringify(node) {
   } else if (node.selector || node.textContent) {
 
     if (node.selector && node.selector === 'mixin') {
+      node.withoutLocals = true
       return code += createMixin(node)
     } else if (node.selector && node.selector[0] === '+') {
       code += callMixin(node) + NL
     } else if (node.selector && node.selector[0] === '-') {
-      code += wrapWithLocals(node.textContent) + NL
+      code += (withoutLocals
+        ? node.textContent
+        : wrapWithLocals(node.textContent)) + NL
+
     } else {
 
-      code += createNode(node.id, node) + NL
+      code += createNode(node.id, node, withoutLocals) + NL
       code += append(parentId, node.id) + NL
     }
   }
 
   if (node.children) {
     for (var i = 0; i < node.children.length; i++) {
-      code += stringify(node.children[i])
+      code += stringify(node.children[i], withoutLocals)
     }
   }
   return code
@@ -344,7 +355,7 @@ module.exports = function(source, opts) {
   opts = opts || {}
 
   function signature() {
-    if (!/^[\t| ]*\(/.test(source)) return ''
+    if (!/^\(/.test(source)) return ''
 
     var ch
     var i = 0
@@ -353,7 +364,7 @@ module.exports = function(source, opts) {
     while (ch = source[i++]) {
       if(ch == '(') ++open
       if(ch == ')') {
-        open--
+        --open
         if (open === 0) {
           value = source.substr(1, i-2)
           source = source.slice(i)
@@ -430,18 +441,26 @@ module.exports = function(source, opts) {
     }
   }
 
-  function includes() {
+  function includes(opts) {
     if (typeof module === 'undefined') return
 
     var re = /(?:(\s*)include (.*)($|[\n\r]))/
     var fs = require('fs')
+    var path = require('path')
+
     source = source.replace(re, function(_, ws, p) {
       var indent = ws.length
       var raw
 
-      try { raw = fs.readFileSync(p) } catch(err) {
+      if (!process) {
+        console.error('Process not available')
+      }
+
+      if (!opts.dir) { opts.dir = process.cwd() }
+      try { raw = fs.readFileSync(path.join(opts.dir, p)) }
+      catch(err) {
         if (err.name === 'TypeError') {
-          err = new Error('File read not possible')
+          err = 'File read not possible'
         }
         console.error(err)
       }
@@ -454,7 +473,7 @@ module.exports = function(source, opts) {
   }
 
   function parse() {
-    includes()
+    includes(opts)
 
     var root = {
       indent: 0,
@@ -500,7 +519,7 @@ module.exports = function(source, opts) {
     return root
   }
 
-  if (opts.output === 'ast') return parse(source)
-  return generate(parse(source), opts)
+  if (opts.output === 'ast') return parse(source, false)
+  return generate(parse(source, false), opts)
 }
 
