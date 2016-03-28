@@ -83,9 +83,11 @@ function startFunction(sig) {
   return 'function ' + sig + ' {'
 }
 
-function callMixin(node) {
-  var params = '(' + node.signature + ')'
-  var call = node.selector.slice(1) + params
+function callMixin(node, withoutLocals) {
+  var sig = '(' + node.signature + ')'
+  sig = node.selector.slice(1) + sig
+
+  var call = withoutLocals ? sig : wrapImmediate(sig)
   return append(node.parent.id, call)
 }
 
@@ -323,7 +325,7 @@ function stringify(node, withoutLocals) {
       node.withoutLocals = true
       return code += createMixin(node)
     } else if (node.selector && node.selector[0] === '+') {
-      code += callMixin(node) + NL
+      code += callMixin(node, withoutLocals) + NL
     } else if (node.selector && node.selector[0] === '-') {
       code += (withoutLocals
         ? node.textContent

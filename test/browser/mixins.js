@@ -80,3 +80,24 @@ test('mixin without arguments, single child node', assert => {
   assert.end()
 })
 
+test('mixin unwrapped local reference', assert => {
+
+  var m = Mineral(`
+    mixin Foo(n)
+      p= n
+
+    each num in [1,2,3]
+
+      +Foo(num)
+
+      `)
+
+  var node = m({ n: 4 })
+
+  var ps = Array.from(node.querySelectorAll('p'))
+  ps.map(p => assert.ok(parseInt(p.textContent, 10) < 4))
+  assert.equal(ps.length, 3)
+
+  assert.end()
+})
+
