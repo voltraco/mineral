@@ -7,14 +7,16 @@ A small fast jade engine with no dependencies.
 # USAGE
 ```js
 let min = require('mineral')
-let users = ['beep', 'boop']
+let strings = ['beep', 'boop']
 
 let template = min(`a(href="/")
   ul
-    each name in ${names}
+    each name in ${strings}
       li= greeting + name`)
 
-node.appendChild(template({ greeting: "hello, " }))
+let t = template({ greeting: "hello, " })
+
+someNode.appendChild(t)
 ```
 
 # FEATURES
