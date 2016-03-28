@@ -115,14 +115,27 @@ test('hello pug', assert => {
   assert.end()
 })
 
-test('entities', assert => {
+test('entities in textContent', assert => {
 
   var m = Mineral(`
     p hello &ndash; thanks&sol;ok&sol;goodbye.
       `)
 
   var node = m()
-  assert.equal(node.querySelector('p').innerHTML, 'hello – thanks/ok/goodbye.')
+  assert.equal(node.querySelector('p').textContent, 'hello – thanks/ok/goodbye.')
+
+  assert.end()
+})
+
+test('entities in attributes', assert => {
+
+  var m = Mineral(`
+    h4
+      span &nbsp;&ndash;&nbsp;
+      `)
+
+  var node = m()
+  assert.equal(node.querySelector('span').innerHTML, '&nbsp;–&nbsp;')
 
   assert.end()
 })

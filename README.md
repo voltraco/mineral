@@ -1,5 +1,5 @@
 # SYNOPSIS
-A small fast jade engine with no dependencies.
+A smaller faster jade engine with zero dependencies.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)

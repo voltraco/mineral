@@ -2,7 +2,7 @@ var NL = '\n'
 var controlflow = ['if', 'else', 'each', 'for', 'while']
 var contentflow = ['include', 'mixin']
 
-var SPLIT_RE = /(?:(?:true|false)|(?:"[^"]+")|(?:'[^']+')|(?:\d*))/
+var PRIMITIVE_RE = /^(["'])((\\["'])?[^"'])+?\1$|^\d+$|^(true|false)$/
 var VAL_RE = /(?:([^,]*)(?:,|$|[\n\r]))/
 var KEY_RE = /([^\s*,=]+)(\s*,\s*)?/
 var DELIM_RE = /(\s*(,\s*)?)/
@@ -13,7 +13,8 @@ function createElement(type) {
 }
 
 function createTextNode(text) {
-  return 'document.createTextNode("' + text + '")'
+  text = 'Entitify("' + text + '")'
+  return 'document.createTextNode(' + text + ')'
 }
 
 function createFragment() {
@@ -36,12 +37,17 @@ function wrapWithLocals(s) {
   return 'with(locals) {' + s + '}'
 }
 
-function wrapNonPrimitives(s) {
-  var clean = function(a) { return !!a }
-  if (s.split(SPLIT_RE).filter(clean).length) {
-    return wrapWithLocals(s)
+function wrapImmediate(s) {
+  return ('(function() {' +
+    wrapWithLocals('return ' + s) +
+  '}())')
+}
+
+function wrapNonPrimitives(test, towrap) {
+  if (!PRIMITIVE_RE.test(test)) {
+    return wrapWithLocals(towrap)
   }
-  return s
+  return towrap
 }
 
 function setAttr(name, k, v) {
@@ -53,21 +59,15 @@ function setAttr(name, k, v) {
   } else {
     s = name + '.setAttribute("' + k + '", ' + v + ')'
   }
-  return wrapNonPrimitives(s)
-}
-
-function wrapImmediate(s) {
-  return ('(function() {' +
-    wrapWithLocals('return ' + s) +
-  '}())')
+  return wrapNonPrimitives(v, s)
 }
 
 function setTextContent(name, v) {
   v = v.replace(NL, '')
 
   if (/\s*=/.test(v)) {
-    var s = name + '.textContent = ' + v.slice(1)
-    return wrapWithLocals(s)
+    v = v.slice(1)
+    return name + '.textContent = ' + wrapImmediate(v)
   }
   return name + '.textContent = Entitify("' + v + '")'
 }
@@ -178,7 +178,7 @@ function createIterator(node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im]) + NL
+      code += stringify(node.children[im])
     }
   }
 
@@ -195,7 +195,7 @@ function createMixin(node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im]) + NL
+      code += stringify(node.children[im])
     }
   }
   code += 'return ' + node.id + NL + '}' + NL
@@ -213,7 +213,7 @@ function createCondition(statement, node) {
 
   if (node.children) {
     for (var im = 0; im < node.children.length; im++) {
-      code += stringify(node.children[im]) + NL
+      code += stringify(node.children[im])
     }
   }
 
@@ -305,7 +305,7 @@ function stringify(node) {
 
   if (node.children) {
     for (var i = 0; i < node.children.length; i++) {
-      code += stringify(node.children[i]) + NL
+      code += stringify(node.children[i])
     }
   }
   return code
