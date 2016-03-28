@@ -23,8 +23,9 @@ someNode.appendChild(t)
 Aside from parsing the jade syntax and generating source text,
 the following control flow features and extras are currently supported...
 
-### CONDITIONALS
-Conditional statements
+### CONTROL-FLOW
+
+`if`, `else if` and `else` statements
 
 ```jade
 if foo
@@ -33,6 +34,14 @@ else if bar
   p The variable `bar` is truthy
 else
   p eh, forget about it.
+
+While loops
+
+```jade
+- var x = 10
+ul
+  while(x--)
+    li= x
 ```
 
 ### SCRIPTING

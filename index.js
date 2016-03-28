@@ -169,6 +169,26 @@ function Each(o, f) {
   }
 }
 
+function createWhileLoop(node, withoutLocals) {
+  var test = node.signature || node.textContent
+  if (test) {
+    test = '(' + (withoutLocals ? test : wrapImmediate(test)) + ')'
+  }
+  var code = ''
+  code += 'while ' + test + ' {' + NL
+  code += decl(node.id, createFragment()) + NL
+
+  if (node.children) {
+    for (var im = 0; im < node.children.length; im++) {
+      code += stringify(node.children[im], withoutLocals)
+    }
+  }
+
+  code += append(node.parent.id, node.id) + NL
+  code += '}'
+  return code
+}
+
 function createIterator(node, withoutLocals) {
   var ops = node.textContent.split(/\s+in\s+/)
 
@@ -284,7 +304,9 @@ function stringify(node, withoutLocals) {
 
   if (controlflow.indexOf(node.selector) > -1) {
 
-    if (node.selector === 'each' || node.selector === 'for') {
+    if (node.selector === 'while') {
+      code += createWhileLoop(node, withoutLocals) + NL
+    } else if (node.selector === 'each' || node.selector === 'for') {
       code += createIterator(node, withoutLocals) + NL
     } else if (node.selector === 'if') {
       code += createIfCondition(node, withoutLocals) + NL

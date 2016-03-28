@@ -244,3 +244,37 @@ test('each without index', assert => {
   assert.end()
 })
 
+test('while with inline variable', assert => {
+
+  var m = Mineral(`
+    - var x = 10
+    while(x--)
+      h1 = x
+        span
+
+    `)
+
+  var node = m()
+
+  assert.equal(node.querySelectorAll('h1').length, 10)
+  assert.equal(node.querySelectorAll('span').length, 10)
+
+  assert.end()
+})
+
+test('while with local variable', assert => {
+
+
+  var m = Mineral(`
+    while(x--)
+      h1 = x
+
+    `)
+
+  var node = m({ x: 10 })
+
+  assert.equal(node.querySelectorAll('h1').length, 10)
+
+  assert.end()
+})
+
