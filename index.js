@@ -151,9 +151,9 @@ function Entitify(s) {
 function Element(name) {
   if (!name) {
     name = 'document'
-    cache['document'] = createDocument()
+    cache['document'] = document.createDocumentFragment()
   } else if (!cache[name]) {
-    cache[name] = createElement(name)
+    cache[name] = document.createElement(name)
   }
   return cache[name].cloneNode(false)
 }
@@ -351,9 +351,6 @@ function generate(tree, opts) {
   var content = stringify(tree)
 
   var body = [
-    'var doc = document',
-    'var createDocument = doc.createDocumentFragment.bind(doc)',
-    'var createElement = doc.createElement.bind(doc)',
     Element.toString(),
     decl('root', createFragment()),
     content,
