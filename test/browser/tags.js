@@ -297,8 +297,7 @@ test('xml tags', assert => {
   var div = document.createElement('div')
   div.appendChild(node)
 
-  var xml = `<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use xlink:href="./sprite.svg#edit"></use></svg><svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200" version="1.1" style="width: 100px; height: 100px;"><circle cx="100" cy="100" r="80" fill="green" stroke="darkgreen" stroke-width="10"></circle></svg>`
-
+  var xml = `<svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icon edit" xmlns="http://www.w3.org/2000/svg"><use xlink:href="./sprite.svg#edit"></use></svg><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="" viewBox="0 0 200 200" version="1.1" style="width: 100px; height: 100px;"><circle cx="100" cy="100" r="80" fill="green" stroke="darkgreen" stroke-width="10"></circle></svg>`
   assert.equal(div.innerHTML, xml)
   assert.end()
 })

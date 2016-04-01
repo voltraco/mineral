@@ -255,7 +255,7 @@ function createNode(id, node, withoutLocals) {
     return code
   }
 
-  var attrs
+  var attrs = {}
     
   if (node.signature) attrs = splitAttrs(node.signature)
 
@@ -267,6 +267,9 @@ function createNode(id, node, withoutLocals) {
     '"http://www.w3.org/2000/xmlns/", ' +
     '"xmlns:xlink", ' + // so ugly wat
     '"http://www.w3.org/1999/xlink")' + NL
+    code += id + '.setAttribute("class", "' + el.className.trim() + '")' + NL
+    el.className = ''
+
   } else if (el.tagName === 'use') {
     code += decl(id, createElement('use', 'http://www.w3.org/2000/svg')) + NL
   } else {
