@@ -3,17 +3,16 @@ var controlflow = ['if', 'else', 'each', 'for', 'while']
 var contentflow = ['include', 'mixin']
 
 var PRIMITIVE_RE = /^(["'])((\\["'])?[^"'])+?\1$|^\d+$|^(true|false)$/
-var VAL_RE = /(?:([^,]*)(?:,|$|[\n\r]))/
-var KEY_RE = /([^\s*,=]+)(\s*,\s*)?/
-var DELIM_RE = /(\s*(,\s*)?)/
+var SPLIT_RE = /,\s*/
 var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
-function createElement(type) {
+function createElement(type, ns) {
+  if (ns) return 'Element("' + type + '", "' + ns + '")'
   return 'Element("' + type + '")'
 }
 
 function createTextNode(text) {
-  return 'document.createTextNode(' + text + ')'
+  return 'doc.createTextNode(' + text + ')'
 }
 
 function createFragment() {
@@ -92,30 +91,11 @@ function callMixin(node, withoutLocals) {
 }
 
 function splitAttrs(str) {
-  var attrs = []
-  lines = str.split('\n')
+  var attrs = {}
+  lines = str.split(SPLIT_RE)
   lines.map(function(source) {
-
-    function match(re) {
-      var m = re.exec(source)
-      if (!m) return
-      source = source.slice(m[0].length)
-      return m
-    }
-
-    function pair() {
-      var k, v
-      match(DELIM_RE)
-      k = match(KEY_RE)
-      if (k && !k[2]) {
-        match(/(?:\s*=\s*)/)
-        v = match(VAL_RE)
-      }
-      if (!k && !v) return
-      return [k && k[1], (v && v[1]) || 'true']
-    }
-
-    while(p = pair()) attrs.push(p)
+    var pair = source.split(/=(.+)?/)
+    return attrs[pair[0].trim()] = pair[1] || true
   })
   return attrs
 }
@@ -148,12 +128,13 @@ function Entitify(s) {
   })
 }
 
-function Element(name) {
+function Element(name, ns) {
   if (!name) {
     name = 'document'
     cache['document'] = createDocument()
   } else if (!cache[name]) {
-    cache[name] = createElement(name)
+    if (ns) cache[name] = createElementNS(ns, name)
+    else cache[name] = createElement(name)
   }
   return cache[name].cloneNode(false)
 }
@@ -274,8 +255,23 @@ function createNode(id, node, withoutLocals) {
     return code
   }
 
+  var attrs
+    
+  if (node.signature) attrs = splitAttrs(node.signature)
+
   el = tag(node.selector)
-  code += decl(id, createElement(el.tagName)) + NL
+
+  if (el.tagName === 'svg') {
+    code += decl(id, createElement('svg', 'http://www.w3.org/2000/svg')) + NL
+    code += id + '.setAttributeNS(' +
+    '"http://www.w3.org/2000/xmlns/", ' +
+    '"xmlns:xlink", ' + // so ugly wat
+    '"http://www.w3.org/1999/xlink")' + NL
+  } else if (el.tagName === 'use') {
+    code += decl(id, createElement('use', 'http://www.w3.org/2000/svg')) + NL
+  } else {
+    code += decl(id, createElement(el.tagName)) + NL
+  }
 
   if (el.id) {
     code += setId(id, el.id) + NL
@@ -285,10 +281,14 @@ function createNode(id, node, withoutLocals) {
     code += setClassName(id, el.className.trim()) + NL
   }
 
-  if (node.signature) {
-    splitAttrs(node.signature).map(function(a) {
-      code += setAttr(id, a[0].trim(), a[1], withoutLocals) + NL
-    })
+  for(var a in attrs) {
+    if (a === 'xlink:href') {
+      code += id + '.setAttributeNS('
+      code += '"http://www.w3.org/1999/xlink", '
+      code += '"href", ' + attrs[a] + ')' + NL
+      continue
+    }
+    code += setAttr(id, a, attrs[a], withoutLocals) + NL
   }
 
   if (node.textContent) {
@@ -354,6 +354,7 @@ function generate(tree, opts) {
     'var doc = document',
     'var createDocument = doc.createDocumentFragment.bind(doc)',
     'var createElement = doc.createElement.bind(doc)',
+    'var createElementNS = doc.createElementNS.bind(doc)',
     Element.toString(),
     decl('root', createFragment()),
     content,

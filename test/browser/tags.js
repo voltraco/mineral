@@ -170,7 +170,7 @@ test('a single tag with multiple multi-line attributes', assert => {
     - x.bar = 200
     .c1 OK
     a(
-      name="quxx"
+      name="quxx",
       data-foo= x.foo,
       data-bar = x.bar)
       .c2 OK
@@ -281,4 +281,26 @@ test('child tags', assert => {
   assert.equal(div.textContent, 'boop')
   assert.end()
 })
+
+test('xml tags', assert => {
+
+  var m = Mineral(`
+
+    svg.icon.edit(xmlns="http://www.w3.org/2000/svg")
+      use(xlink:href="./sprite.svg#edit")
+
+    svg(viewBox="0 0 200 200", version="1.1", style="width: 100px; height: 100px;")
+      circle(cx="100", cy="100", r="80", fill="green", stroke ="darkgreen", stroke-width ="10")
+  `)
+
+  var node = m()
+  var div = document.createElement('div')
+  div.appendChild(node)
+
+  var xml = `<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use xlink:href="./sprite.svg#edit"></use></svg><svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200" version="1.1" style="width: 100px; height: 100px;"><circle cx="100" cy="100" r="80" fill="green" stroke="darkgreen" stroke-width="10"></circle></svg>`
+
+  assert.equal(div.innerHTML, xml)
+  assert.end()
+})
+
 
