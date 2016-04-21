@@ -182,6 +182,23 @@ test('each and for wrapped for locals', assert => {
   assert.end()
 })
 
+test('each over object', assert => {
+
+  var m = Mineral(`
+
+    each val, key in { a: 1, b: 2, c: 3 }
+      h1= val + key
+  `)
+
+  var node = m()
+  var h1s = node.querySelectorAll('h1')
+  assert.equal(h1s[0].textContent, '1a')
+  assert.equal(h1s[1].textContent, '2b')
+  assert.equal(h1s[2].textContent, '3c')
+
+  assert.end()
+})
+
 test('each with index', assert => {
 
   var m = Mineral(`

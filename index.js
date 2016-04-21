@@ -140,12 +140,13 @@ function Element(name, ns) {
 }
 
 function Each(o, f) {
+  var has = Object.prototype.hasOwnProperty
   if (Array.isArray(o)) {
     for (var i = 0; i < o.length; ++i) {
       f.call(null, o[i], i) }
   } else {
     for (var k in o) {
-      if (Object.prototype.hasOwnProperty(o, k)) {
+      if (has.call(o, k)) {
         f.call(null, o[k], k)
       }
     }
