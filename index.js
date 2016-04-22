@@ -47,7 +47,7 @@ function wrapNonPrimitives(test, towrap) {
 }
 
 function setAttr(name, k, v, withoutLocals) {
-  v = v.trim()
+  v = typeof v === 'string' ? v.trim() : 'true'
   var s = ''
 
   if (k === 'class') {
