@@ -1,6 +1,6 @@
 {
   "name": "mineral",
-  "version": "2.6.4",
+  "version": "2.7.4",
   "description": "A small and fast jade engine",
   "main": "index.js",
   "scripts": {
