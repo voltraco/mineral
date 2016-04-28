@@ -238,6 +238,20 @@ function createElseCondition(node, withoutLocals) {
   return createCondition('else', node, withoutLocals)
 }
 
+function createNodeNS(id, el) {
+  var code = ''
+  code += decl(id, createElement(el.tagName, 'http://www.w3.org/2000/svg')) + NL
+  code += id + '.setAttributeNS(' +
+  '"http://www.w3.org/2000/xmlns/", ' +
+  '"xmlns:xlink", ' + // so ugly wat
+  '"http://www.w3.org/1999/xlink")' + NL
+  if (el.className && el.className.length) {
+    code += id + '.setAttribute("class", "' + el.className.trim() + '")' + NL
+    el.className = ''
+  }
+  return code
+}
+
 function createNode(id, node, withoutLocals) {
   var code = ''
 
@@ -257,22 +271,15 @@ function createNode(id, node, withoutLocals) {
   }
 
   var attrs = {}
-    
+
   if (node.signature) attrs = splitAttrs(node.signature)
 
   el = tag(node.selector)
 
   if (el.tagName === 'svg') {
-    code += decl(id, createElement('svg', 'http://www.w3.org/2000/svg')) + NL
-    code += id + '.setAttributeNS(' +
-    '"http://www.w3.org/2000/xmlns/", ' +
-    '"xmlns:xlink", ' + // so ugly wat
-    '"http://www.w3.org/1999/xlink")' + NL
-    code += id + '.setAttribute("class", "' + el.className.trim() + '")' + NL
-    el.className = ''
-
+    code += createNodeNS(id, el)
   } else if (el.tagName === 'use') {
-    code += decl(id, createElement('use', 'http://www.w3.org/2000/svg')) + NL
+    code += createNodeNS(id, el)
   } else {
     code += decl(id, createElement(el.tagName)) + NL
   }
@@ -551,4 +558,3 @@ module.exports = function(source, opts) {
   if (opts.output === 'ast') return parse(source, false)
   return generate(parse(source, false), opts)
 }
-
