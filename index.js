@@ -7,8 +7,8 @@ var SPLIT_RE = /,\s*/
 var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
 function createElement(type, ns) {
-  if (ns) return 'Element("' + type + '", "' + ns + '")'
-  return 'Element("' + type + '")'
+  if (ns) return '__Element("' + type + '", "' + ns + '")'
+  return '__Element("' + type + '")'
 }
 
 function createTextNode(text) {
@@ -16,7 +16,7 @@ function createTextNode(text) {
 }
 
 function createFragment() {
-  return 'Element()'
+  return '__Element()'
 }
 
 function decl(lval, rval) {
@@ -128,7 +128,7 @@ function Entitify(s) {
   })
 }
 
-function Element(name, ns) {
+function __Element(name, ns) {
   if (!name) {
     name = 'document'
     cache['document'] = createDocument()
@@ -366,7 +366,7 @@ function generate(tree, opts) {
     'var createDocument = doc.createDocumentFragment.bind(doc)',
     'var createElement = doc.createElement.bind(doc)',
     'var createElementNS = doc.createElementNS.bind(doc)',
-    Element.toString(),
+    __Element.toString(),
     decl('root', createFragment()),
     content,
     'return root'
