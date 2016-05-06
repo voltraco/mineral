@@ -92,7 +92,7 @@ function callMixin(node, withoutLocals) {
 
 function splitAttrs(str) {
   var attrs = {}
-  lines = str.split(SPLIT_RE)
+  var lines = str.split(SPLIT_RE)
   lines.map(function(source) {
     var pair = source.split(/=(.+)?/)
     return attrs[pair[0].trim()] = pair[1] || true
