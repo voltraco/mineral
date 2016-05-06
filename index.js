@@ -350,23 +350,23 @@ function generate(tree, opts) {
   var cache = {}
   var content = stringify(tree)
 
-  function newElement(name, ns) {
-    if (!name) {
-      name = 'document'
-      cache['document'] = createDocument()
-    } else if (!cache[name]) {
-      if (ns) cache[name] = createElementNS(ns, name)
-      else cache[name] = createElement(name)
-    }
-    return cache[name].cloneNode(false)
-  }
+  var newElement = ['function newElement(name, ns) {',
+  '  if (!name) {',
+  '    name = \'document\'',
+  '    cache[\'document\'] = createDocument()',
+  '  } else if (!cache[name]) {',
+  '    if (ns) cache[name] = createElementNS(ns, name)',
+  '    else cache[name] = createElement(name)',
+  '  }',
+  '  return cache[name].cloneNode(false)',
+  '}'].join('\n')
 
   var body = [
     'var doc = document',
     'var createDocument = doc.createDocumentFragment.bind(doc)',
     'var createElement = doc.createElement.bind(doc)',
     'var createElementNS = doc.createElementNS.bind(doc)',
-    'var newElement = ' + newElement.toString(),
+    'var newElement = ' + newElement,
     decl('root', createFragment()),
     content,
     'return root'
