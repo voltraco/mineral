@@ -274,7 +274,7 @@ function createNode(id, node, withoutLocals) {
 
   if (node.signature) attrs = splitAttrs(node.signature)
 
-  el = tag(node.selector)
+  var el = tag(node.selector)
 
   if (el.tagName === 'svg') {
     code += createNodeNS(id, el)
