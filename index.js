@@ -7,8 +7,8 @@ var SPLIT_RE = /,\s*/
 var TAG_RE = /((?:\.|#)?(?:[^\.\#]+))/g
 
 function createElement(type, ns) {
-  if (ns) return '__Element("' + type + '", "' + ns + '")'
-  return '__Element("' + type + '")'
+  if (ns) return 'newElement("' + type + '", "' + ns + '")'
+  return 'newElement("' + type + '")'
 }
 
 function createTextNode(text) {
@@ -16,7 +16,7 @@ function createTextNode(text) {
 }
 
 function createFragment() {
-  return '__Element()'
+  return 'newElement()'
 }
 
 function decl(lval, rval) {
@@ -126,17 +126,6 @@ function Entitify(s) {
     container.innerHTML = e
     return container.textContent
   })
-}
-
-function __Element(name, ns) {
-  if (!name) {
-    name = 'document'
-    cache['document'] = createDocument()
-  } else if (!cache[name]) {
-    if (ns) cache[name] = createElementNS(ns, name)
-    else cache[name] = createElement(name)
-  }
-  return cache[name].cloneNode(false)
 }
 
 function Each(o, f) {
@@ -361,12 +350,23 @@ function generate(tree, opts) {
   var cache = {}
   var content = stringify(tree)
 
+  function newElement(name, ns) {
+    if (!name) {
+      name = 'document'
+      cache['document'] = createDocument()
+    } else if (!cache[name]) {
+      if (ns) cache[name] = createElementNS(ns, name)
+      else cache[name] = createElement(name)
+    }
+    return cache[name].cloneNode(false)
+  }
+
   var body = [
     'var doc = document',
     'var createDocument = doc.createDocumentFragment.bind(doc)',
     'var createElement = doc.createElement.bind(doc)',
     'var createElementNS = doc.createElementNS.bind(doc)',
-    __Element.toString(),
+    'var newElement = ' + newElement.toString(),
     decl('root', createFragment()),
     content,
     'return root'
