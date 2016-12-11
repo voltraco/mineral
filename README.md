@@ -34,6 +34,7 @@ else if bar
   p The variable `bar` is truthy
 else
   p eh, forget about it.
+```
 
 While loops
 
