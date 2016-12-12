@@ -1,0 +1,4 @@
+mixin Greeting()
+  h1 Hello World
+  span This is a greeting.
+

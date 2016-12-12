@@ -1,5 +1,5 @@
 # SYNOPSIS
-A smaller faster jade engine with zero dependencies.
+A simplified fork of the jade template language.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)

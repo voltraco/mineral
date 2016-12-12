@@ -1,14 +1,9 @@
 {
   "name": "mineral",
-  "version": "2.7.9",
-  "description": "A small and fast jade engine",
+  "version": "3.0.0",
+  "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
-  "scripts": {
-    "test": "npm run server && npm run browser",
-    "browser": "browserify test/browser/*.js | tape-run",
-    "server": "node test/server/*.js",
-    "perf": "browserify test/perf/index.js | tape-run"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voltraco/mineral.git"
@@ -28,5 +23,9 @@
     "json-stringify-safe": "^5.0.1",
     "tape": "^4.5.1",
     "tape-run": "^2.1.3"
+  },
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "object-path": "^0.11.3"
   }
 }

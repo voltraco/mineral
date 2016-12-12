@@ -35,7 +35,7 @@ module.exports = function Lexer (str, options) {
     var str = m[0]
     updatePosition(str)
     lexer.source = lexer.source.slice(m.index + str.length)
-    //console.log('>', arguments.callee.caller.name, "'" + m + "'")
+    // console.log('>', arguments.callee.caller.name, "'" + m + "'")
     return m
   }
 

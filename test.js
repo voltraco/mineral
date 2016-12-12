@@ -1,18 +1,28 @@
 var parser = require('./parser')
-var compiler = require('./compiler')
+var compiler = require('./compilers')
 var log = require('./log')
 
 var jade = `
-  section.foo#bar(data-foo="bar" quxx=beep boop) Testing. 1, 2, 3.
-    div
-      .bazz Fooooo
-        | BAR
 
-    span done.
-
+  .a
+    .aa TXT
+    .ab TXT
+    /* cmt */
+  .b =quxx
+    .ba TXT
+      | =quxx
 `
 
 var tree = parser(jade)
+//log(tree)
+
+function resolver (tag) {
+  console.log(tag.tagname)
+  console.log(tag.content)
+  return 'x'
+}
+
 log(tree)
-log(compiler.html(tree))
+var data = { quxx: 'FOO' }
+console.log(compiler.html(tree, data, resolver))
 
