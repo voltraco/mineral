@@ -2,7 +2,6 @@ var QUOTED_RE = /^"|'/
 var WORD_RE = /^[^\n\r =]+/
 var DELIMITER_RE = /^=/
 var WHITESPACE_RE = /^[^\S\x0a\x0d]*/ // but not new lines
-var CONTENT_RE= /^[^\n\r\x0a\x0d]*/ // anything except newline
 var ANYSPACE_RE = /^\s*/ // any whitespace
 var NON_WHITESPACE_RE = /^\S+/ // any non whitespace
 var TAGORSYMBOL_RE = /[\.#]?[^(\s]*/ // any valid tag or symbol
@@ -117,7 +116,17 @@ module.exports = function Lexer (str, options) {
     var pair = lexer.peek(0, 2)
     var value = ''
 
-    if (pair === '/*') {
+    if (pair === '//') {
+      value = lexer.pop(0, 2)
+
+      while (true) {
+        var ch = lexer.peek()
+        if (/[\x0a\x0d]+/.test(ch)) break
+        value += lexer.pop()
+      }
+
+      updatePosition(value)
+    } else if (pair === '/*') {
       value = lexer.pop(0, 2)
 
       while (true) {
@@ -211,8 +220,30 @@ module.exports = function Lexer (str, options) {
   }
 
   pm.content = function content () {
-    var m = matcher(CONTENT_RE)
-    return m && m[0]
+    var value = ''
+    var lastch = ''
+
+    while(true) {
+      var ch = lexer.peek(0, 1)
+
+      if (ch === '/') {
+        var nextch = lexer.peek(1, 2)
+        if (lastch !== ':' && nextch === '/') {
+          value = value.trim() // its a line comment, not a url
+          break
+        }
+
+        if (nextch === '*') {
+          value = value.trim() // block comment
+          break
+        }
+      } else if (NEWLINE_RE.test(ch) || lexer.length() === 0) {
+        break
+      }
+      lastch = lexer.pop()
+      value += lastch
+    }
+    return value
   }
 
   return lexer

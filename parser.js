@@ -29,6 +29,7 @@ module.exports = function Parser (source) {
   var root = { tagOrSymbol: 'document', children: [] }
   var parent = root
   var lastIndent = 0
+  var lastSibling = null
   var contentTarget = null
   var lexer = Lexer(source)
 
@@ -64,7 +65,8 @@ module.exports = function Parser (source) {
         content: lexer.match.content(),
         indent: indent,
         children: [],
-        parent: parent
+        parent: parent,
+        pos: lexer.pos()
       }
 
       if (tagOrSymbol.slice(-1) === '.') {
@@ -73,7 +75,8 @@ module.exports = function Parser (source) {
       }
 
       if (indent > lastIndent) {
-        parent.children.push(tag)
+        (lastSibling || parent).children.push(tag)
+        lastSibling = null
         parent = tag
       } else if (indent < lastIndent) {
         while (parent && parent.indent >= indent) {
@@ -81,10 +84,12 @@ module.exports = function Parser (source) {
         }
         tag.parent = parent
         tag.parent.children.push(tag)
+        lastSibling = null
         parent = tag
       } else {
         tag.parent = parent.parent || parent
         tag.parent.children.push(tag)
+        lastSibling = tag
       }
       lastIndent = indent
     }

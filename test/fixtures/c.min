@@ -1,4 +1,4 @@
-html
+html /* haystack! */
 body
   .a
     .aa TXT
@@ -13,12 +13,20 @@ body
   else if a.val === 26
     h2 N26
   else
-    h2 NONE
+    h2 https://foobar.com
+
+  span xy // comment!
+
+  while a.val--
+    span test
+
+  for i in arr
+    span =arr[i]
 
   mixin Greeting
     h1 Hello, World.
 
-  include ./a.min
+  include ./a/a.min
 
   +Greeting
   +Greeting

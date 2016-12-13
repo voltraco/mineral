@@ -1,30 +1,66 @@
 const fs = require('fs')
 const path = require('path')
 const argv = require('minimist')(process.argv.slice(2))
+const mkdirp = require('mkdirp')
 
 const parse = require('../parser')
 const compile = require('../compilers')
+const readdirSync = require('./readdirsync')
 
-function readdirSync (p) {
-  const files = fs.readdirSync(p)
+if (argv.h) {
+  console.log(`
+    Usage:
+      min FILE1, ... [options]
 
-  return [].concat.apply([], files.map(file => {
-    let s = fs.statSync(path.join(p, file))
-    if (s && s.isDirectory()) {
-      return readdirSync(path.join(p, file))
-    }
-    if (/\.min$/.test(file)) {
-      return path.join(p, file)
-    }
-  })).filter(v => !!v)
+    Options:
+      -o DIR       Output directory
+      -d '...'     A string of JSON, used as locals
+      --data FILE  A path to a JSON file to use as locals
+  `)
+
+  process.exit(0)
 }
 
-const sources = readdirSync(path.dirname(argv._[0]))
-const data = argv.d || { quxx: 100, a: { val: 27 }, b: 50 }
+let data = {}
 
-const location = path.dirname(argv._[0])
-const source = fs.readFileSync(argv._[0], 'utf8')
-const html = compile.html(parse(source), data, location)
+if (argv.d) {
+  try {
+    data = JSON.parse(argv.d)
+  } catch (ex) {
+    console.error('Unable to parse data')
+    process.exit(1)
+  }
+} else if (argv.data) {
+  try {
+    data = require(path.resolve(argv.data))
+  } catch (ex) {
+    console.error('Unable to read file')
+    process.exit(1)
+  }
+}
 
-process.stdout.write(html)
+// TODO: get a pre-cache all mixins
+//const sources = readdirSync(path.dirname(argv._[0]))
+
+argv._.map(file => {
+  const location = path.dirname(file)
+  const source = fs.readFileSync(file, 'utf8')
+  const html = compile.html(parse(source), data, location)
+
+  if (!argv.o) {
+    process.stdout.write(html + '\n')
+  } else {
+    var out = path.join(
+      path.resolve(location),
+      path.relative(location, argv.o)
+    )
+    mkdirp.sync(out)
+    try {
+      fs.writeFileSync(path.join(out, path.basename(file)), html)
+    } catch (ex) {
+      console.error(ex)
+      process.exit(1)
+    }
+  }
+})
 

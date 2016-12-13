@@ -1,30 +1,32 @@
-var common = require('./common')
-var mixins = {}
+const common = require('./common')
+const log = require('../log')
+const mixins = {}
 
-var IF_RE = /^\s*if\s*/
-var EQ_RE = /^\s*=\s*/
-var QUOTE_RE = /^"|'/
+const IF_RE = /^\s*if\s*/
+const IN_RE = /\s*in\s*/
+const LINE_COMMENT_RE = /^\/\//
+const EQ_RE = /^\s*=\s*/
+const QUOTE_RE = /^"|'/
 
 // determine if this is a path or just regular content
-function getValue (data, str) {
+function getValue (data, info, str) {
   if (!EQ_RE.test(str)) return str
-  var exp = str.replace(EQ_RE, '')
-  return common.scopedExpression(data, exp)
+  const exp = str.replace(EQ_RE, '')
+  return common.scopedExpression(data, info, exp)
 }
 
 function html (tree, data, location, cb) {
-  if (!tree.children || !tree.children.length) return ''
+  let findElseBranch = false
 
-  var findElseBranch = false
-
-  return tree.children.map(function (child, index) {
-
+  function compile(child, index) {
+    //
+    // first handle any flow control statements
+    //
     if (child.tagOrSymbol === 'else') {
-
-      // if this is an "else if"
+      // if this is an else-if
       if (IF_RE.test(child.content)) {
-        var exp = child.content.replace(IF_RE, '')
-        if (common.scopedExpression(data, exp)) {
+        const exp = child.content.replace(IF_RE, '')
+        if (common.scopedExpression(data, child.pos, exp)) {
           findElseBranch = false
           return html(child, data, location, cb)
         }
@@ -34,7 +36,6 @@ function html (tree, data, location, cb) {
       if (!findElseBranch) return ''
 
       findElseBranch = false
-      // regular else statement
       return html(child, data, location, cb)
     }
 
@@ -45,7 +46,7 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'if') {
-      if (common.scopedExpression(data, child.content)) {
+      if (common.scopedExpression(data, child.pos, child.content)) {
         return html(child, data, location, cb)
       }
       findElseBranch = true
@@ -53,61 +54,74 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'while') {
-      var value = ''
-      while (common.scopedExpression(data. child.content)) {
+      let value = ''
+      while (common.scopedExpression(data, child.pos, child.content)) {
         value += html(child, data, location, cb)
       }
       return value
     }
 
-    // treat all piped text as plain content.
-    if (child.tagOrSymbol === '|') {
-      return (' ' + getValue(data, child.content))
+    if (child.tagOrSymbol === 'for') {
+      const parts = child.content.split(IN_RE)
+      const object = common.scopedExpression(data, child.pos, parts[1])
+      let value = ''
+      common.each(object, function (_value, key) {
+        // create a new shallow scope so that locals dont persist
+        const locals = { [parts[0]]: key }
+        const scope = Object.assign({}, data, locals)
+        value += html(child, scope, location, cb)
+      })
+      return value
     }
 
-    if (child.tagOrSymbol === '//') {
+    // treat all piped text as plain content.
+    if (child.tagOrSymbol === '|') {
+      return (' ' + getValue(data, child.pos, child.content))
+    }
+
+    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
       return ''
     }
 
-    // anything starting with a '+' is a function call.
+    // anything prefixed with '+' is a mixin call.
     if (child.tagOrSymbol[0] === '+' && cb) {
-      var name = child.tagOrSymbol.slice(1)
-      if (!mixins[name]) throw new Error('Unknown mixin')
+      const name = child.tagOrSymbol.slice(1)
+      if (!mixins[name]) {
+        common.die(child.pos, 'TypeError', 'Unknown mixin')
+      }
       return html(mixins[name], data, location, cb)
     }
 
+    // defines a mixin
     if (child.tagOrSymbol === 'mixin') {
-      var name = child.content.split(/\s|\(/)[0]
+      const name = child.content.split(/\s|\(/)[0]
       mixins[name] = child
       return ''
     }
 
     if (child.tagOrSymbol === 'include') {
       // pass location to the cb so inlcudes can be relative
-      var resolved = cb({
-        path: child.content,
-        location: location
-      })
+      const path = child.content
+      const resolved = cb({ path, location })
       return html(resolved.tree, data, resolved.location, cb)
     }
 
-    // everything else is a tag or a flow control statement.
-    var props = common.resolveTagOrSymbol(child.tagOrSymbol)
+    //
+    // everything else is a tag
+    //
+    const props = common.resolveTagOrSymbol(child.tagOrSymbol)
 
-    if (props.tagname === 'if') {
-    }
-
-    var tag = ['<', props.tagname]
+    let tag = ['<', props.tagname]
 
     if (props.classname.length) {
       tag.push(' class="', props.classname, '"')
     }
 
     if (child.attributes) {
-      var attrs = Object.keys(child.attributes).map(function (key) {
-        var value = child.attributes[key]
+      const attrs = Object.keys(child.attributes).map(key => {
+        let value = child.attributes[key]
         if (!QUOTE_RE.test(value.trim())) {
-          value = getValue(data, value)
+          value = getValue(data, child.pos, value)
         }
         return [key, '=', value].join('')
       })
@@ -117,10 +131,10 @@ function html (tree, data, location, cb) {
     tag.push('>') // html5 doesn't care about self closing tags
 
     if (child.content) {
-      tag.push(getValue(data, child.content))
+      tag.push(getValue(data, child.pos, child.content))
     }
 
-    // recurse
+    // nothing left to decide, recurse if there are child nodes
     if (child.children.length) {
       tag.push(html(child, data, location, cb))
     }
@@ -131,7 +145,12 @@ function html (tree, data, location, cb) {
     }
 
     return tag.join('')
-  }).join('')
+  }
+
+  if (tree.children && tree.children.length) {
+    return tree.children.map(compile).join('')
+  }
+  return ''
 }
 
 module.exports = function (tree, data, location, cb) {

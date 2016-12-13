@@ -1,11 +1,11 @@
-//var opath = require('object-path')
-var fs = require('fs')
-var path = require('path')
+const fs = require('fs')
+const fmt = require('util').format
+const path = require('path')
 
-var parse = require('../parser')
+const parse = require('../parser')
 
-var CLASS_RE = /\.[^.]+/g
-var ID_RE = /#[^. ]+/g
+const CLASS_RE = /\.[^.]+/g
+const ID_RE = /#[^. ]+/g
 
 exports.unclosed = [
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'html',
@@ -13,13 +13,8 @@ exports.unclosed = [
   'doctype'
 ]
 
-//exports.getValue = function (data, str) {
-//  var path = str.replace(/\s*=\s*/, '')
-//  return opath.get(data, path.trim()) || ''
-//}
-
 exports.resolveTagOrSymbol = function resolveTagOrSymbol (string) {
-  var props = {
+  const props = {
     tagname: 'div',
     classname: [],
     id: '',
@@ -42,8 +37,8 @@ exports.resolveTagOrSymbol = function resolveTagOrSymbol (string) {
 }
 
 exports.resolveInclude = function resolver (info) {
-  var dirname = info.location || process.cwd()
-  var stat = null
+  let dirname = info.location || process.cwd()
+  let stat = null
 
   try {
     stat = fs.statSync(info.location)
@@ -54,8 +49,8 @@ exports.resolveInclude = function resolver (info) {
     dirname = path.dirname(info.location)
   }
 
-  var location = path.resolve(dirname, info.path)
-  var text = fs.readFileSync(location, 'utf8')
+  const location = path.resolve(dirname, info.path)
+  const text = fs.readFileSync(location, 'utf8')
 
   return {
     tree: parse(text),
@@ -63,13 +58,37 @@ exports.resolveInclude = function resolver (info) {
   }
 }
 
-exports.scopedExpression = function scopedExpression (data, str) {
-  var body = ['return ' + str + ';']
-  var args = Object.keys(data).concat(body)
-  var fn = Function.apply(null, args)
-  var values = Object.keys(data).map(function (k) {
-    return data[k]
-  })
-  return fn.apply(data, values)
+exports.die = function die (info, name, message) {
+  const msg = fmt('%s:%d:%d', message, info.column, info.lineno)
+  const err = new Error(msg)
+  err.name = name
+  throw err
+}
+
+exports.scopedExpression = function scopedExpression (data, info, str) {
+  const body = ['return ' + str + ';']
+  const args = Object.keys(data).concat(body)
+  const fn = Function.apply(null, args)
+  const values = Object.keys(data).map(k => data[k])
+
+  try {
+    return fn.apply(data, values)
+  } catch (ex) {
+    exports.die(info, ex.name, ex.message)
+  }
+}
+
+exports.each = function each(o, f) {
+  const has = Object.prototype.hasOwnProperty
+  if (Array.isArray(o)) {
+    for (let i = 0; i < o.length; ++i) {
+      f.call(null, o[i], i) }
+  } else {
+    for (let k in o) {
+      if (has.call(o, k)) {
+        f.call(null, o[k], k)
+      }
+    }
+  }
 }
 
