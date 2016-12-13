@@ -1,4 +1,3 @@
-mixin Greeting()
-  h1 Hello World
-  span This is a greeting.
-
+h1 FOOOO
+span Bla Bla Bla
+include ./b.min

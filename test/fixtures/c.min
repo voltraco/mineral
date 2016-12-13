@@ -1,0 +1,25 @@
+html
+body
+  .a
+    .aa TXT
+    .ab TXT
+    /* cmt */
+  .b =quxx
+    .ba TXT
+      | = quxx + 23
+
+  if a.val === 25
+    h1 N25
+  else if a.val === 26
+    h2 N26
+  else
+    h2 NONE
+
+  mixin Greeting
+    h1 Hello, World.
+
+  include ./a.min
+
+  +Greeting
+  +Greeting
+

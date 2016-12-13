@@ -33,7 +33,6 @@ module.exports = function Parser (source) {
   var lexer = Lexer(source)
 
   while (lexer.length()) {
-    lexer.match.newline()
     var whitespace = lexer.match.whitespace()
     lexer.match.comment()
 
@@ -89,6 +88,7 @@ module.exports = function Parser (source) {
       }
       lastIndent = indent
     }
+    lexer.match.newline()
   }
   return root
 }

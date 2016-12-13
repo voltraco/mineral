@@ -35,7 +35,7 @@ module.exports = function Lexer (str, options) {
     var str = m[0]
     updatePosition(str)
     lexer.source = lexer.source.slice(m.index + str.length)
-    // console.log('>', arguments.callee.caller.name, "'" + m + "'")
+    //console.log('>', arguments.callee.caller.name, "'" + m + "'")
     return m
   }
 
@@ -117,17 +117,7 @@ module.exports = function Lexer (str, options) {
     var pair = lexer.peek(0, 2)
     var value = ''
 
-    if (pair === '//') {
-      value = lexer.pop(0, 2)
-
-      while (true) {
-        var ch = lexer.peek()
-        if (/[\x0a\x0d]+/.test(ch)) break
-        value += lexer.pop()
-      }
-
-      updatePosition(value)
-    } else if (pair === '/*') {
+    if (pair === '/*') {
       value = lexer.pop(0, 2)
 
       while (true) {

@@ -1,6 +1,8 @@
-var parser = require('./parser')
-var compiler = require('./compilers')
+var parse = require('./parser')
+var compile = require('./compilers')
 var log = require('./log')
+var fs = require('fs')
+var path = require('path')
 
 var jade = `
 
@@ -11,18 +13,21 @@ var jade = `
   .b =quxx
     .ba TXT
       | =quxx
+
+  mixin Greeting()
+    h1 Hello, World.
+
+  include ./test/fixtures/a.min
+
+  +Greeting
+  +Greeting
 `
 
-var tree = parser(jade)
+var tree = parse(jade)
 //log(tree)
 
-function resolver (tag) {
-  console.log(tag.tagname)
-  console.log(tag.content)
-  return 'x'
-}
-
-log(tree)
 var data = { quxx: 'FOO' }
-console.log(compiler.html(tree, data, resolver))
+
+var html = compile.html(tree, data, process.cwd())
+process.stdout.write(html)
 
