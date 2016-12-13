@@ -4,8 +4,11 @@ const argv = require('minimist')(process.argv.slice(2))
 const mkdirp = require('mkdirp')
 
 const parse = require('../parser')
-const compile = require('../compilers')
 const readdirSync = require('./readdirsync')
+
+const compilers = {}
+compilers.html = require('../compilers/html')
+compilers.dom = require('../compilers/dom')
 
 if (argv.h) {
   console.log(`
@@ -45,7 +48,7 @@ if (argv.d) {
 argv._.map(file => {
   const location = path.dirname(file)
   const source = fs.readFileSync(file, 'utf8')
-  const html = compile.html(parse(source), data, location)
+  const html = compilers.html(parse(source), data, location)
 
   if (!argv.o) {
     process.stdout.write(html + '\n')

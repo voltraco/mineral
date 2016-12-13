@@ -94,8 +94,9 @@ function html (tree, data, location, cb) {
 
     // defines a mixin
     if (child.tagOrSymbol === 'mixin') {
-      const name = child.content.split(/\s|\(/)[0]
-      mixins[name] = child
+      const params = child.content.split(' ')
+      console.log(params)
+      mixins[params[0]] = child
       return ''
     }
 

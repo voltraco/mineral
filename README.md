@@ -1,22 +1,40 @@
 # SYNOPSIS
-A simplified fork of the jade template language.
+A simplified fork of the pug/jade template language.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
 
-# USAGE
+# EXAMPLE
+Here is an example `.min` file, it looks a lot like pug/jade.
+```jade
+html
+body
+  head
+    link(id="css" href="../static/index.css" rel="stylesheet")
+  section
+    h1 Hello, World!
+```
+
+# COMMAND LINE USAGE
+```
+$ min example.min -o .
+```
+
+# MODULE USAGE
 ```js
-let min = require('mineral')
-let strings = ['beep', 'boop']
+const min = require('mineral')
+const strings = ['beep', 'boop']
 
-let template = min(`a(href="/")
+let template = min.dom(`
+  a(href="/")
   ul
-    each name in ${strings}
-      li= greeting + name`)
+    for name in ${strings}
+      li= greeting + name
+`)
 
-let t = template({ greeting: "hello, " })
+const t = template({ greeting: "hello, " })
 
-someNode.appendChild(t)
+someNode.appendChild(t) // append to dom or vdom
 ```
 
 # FEATURES
@@ -39,9 +57,8 @@ else
 While loops
 
 ```jade
-- var x = 10
 ul
-  while(x--)
+  while x--
     li= x
 ```
 
@@ -67,10 +84,7 @@ Inline scriping
 Expressions
 
 ```jade
-  - var a = 100;
-  - var b = { number: 100 }
-  h1= a + b.number
-  .a(name= 'el' + a)= 'my name is el' + a
+  h1= 'number of times: ' + 100 + 'x'
 ```
 
 ### MIXINS
@@ -79,7 +93,7 @@ Create mixins
 
 ```jade
 .foo
-mixin Person(firstName, lastName)
+mixin Person (firstName, lastName)
   h1= firstName
   h2= lastName
 ```
@@ -88,7 +102,7 @@ Use mixins
 
 ```jade
 .person
-  +Person('Jello', 'Biafra')` call mixins
+  +Person 'Jello', 'Biafra'
 ```
 
 ### ITERATORS

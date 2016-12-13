@@ -1,18 +1,18 @@
-var Lexer = require('./lexer')
+const Lexer = require('./lexer')
 
 function parseAttributes (str) {
-  var lexer = Lexer(str)
-  var args = {}
+  const lexer = Lexer(str)
+  const args = {}
 
   while (lexer.length()) {
     lexer.match.whitespace()
-    var word = lexer.match.word()
+    const word = lexer.match.word()
     if (!word) return args
     lexer.match.whitespace()
 
-    var delimiter = lexer.match.delimiter()
+    const delimiter = lexer.match.delimiter()
 
-    var value = true
+    let value = true
     if (delimiter) {
       lexer.match.whitespace()
       value = lexer.match.value().trim()
@@ -26,15 +26,16 @@ function parseAttributes (str) {
 module.exports = function Parser (source) {
   source = source.replace(/\t/g, '  ')
 
-  var root = { tagOrSymbol: 'document', children: [] }
-  var parent = root
-  var lastIndent = 0
-  var lastSibling = null
-  var contentTarget = null
-  var lexer = Lexer(source)
+  const lexer = Lexer(source)
+  const root = { tagOrSymbol: 'document', children: [] }
+
+  let parent = root
+  let lastIndent = 0
+  let lastSibling = null
+  let contentTarget = null
 
   while (lexer.length()) {
-    var whitespace = lexer.match.whitespace()
+    const whitespace = lexer.match.whitespace()
     lexer.match.comment()
 
     if (contentTarget) {
@@ -46,20 +47,20 @@ module.exports = function Parser (source) {
       }
     }
 
-    var tagOrSymbol = lexer.match.tagOrSymbol()
+    const tagOrSymbol = lexer.match.tagOrSymbol()
 
     if (tagOrSymbol) {
 
-      var attributes = (!contentTarget &&
+      const attributes = (!contentTarget &&
         parseAttributes(lexer.match.parens()))
 
       lexer.match.whitespace()
       lexer.match.comment()
 
-      var indent = whitespace.length
+      const indent = whitespace.length
       if (indent % 2 !== 0) lexer.error('Uneven indent')
 
-      var tag = {
+      const tag = {
         tagOrSymbol: tagOrSymbol,
         attributes: attributes,
         content: lexer.match.content(),

@@ -1,9 +1,8 @@
-html /* haystack! */
+html // haystack!
 body
   .a
     .aa TXT
     .ab TXT
-    /* cmt */
   .b =quxx
     .ba TXT
       | = quxx + 23
