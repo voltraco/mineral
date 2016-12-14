@@ -1,8 +1,8 @@
 .foo
 
-  mixin Greeting foo
-    h1 bar
+  Greeting(foo)
+    h1 =foo
 
-  +Greeting
+  +Greeting('hello')
   +Greeting
 

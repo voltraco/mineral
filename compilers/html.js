@@ -17,12 +17,17 @@ function getValue (data, info, str) {
 
 function html (tree, data, location, cb) {
   let findElseBranch = false
+  let logical = false
 
   function compile(child, index) {
+    if (child.html) return child.html
+
+    const firstLetter = child.tagOrSymbol.charCodeAt(0)
     //
     // first handle any flow control statements
     //
     if (child.tagOrSymbol === 'else') {
+      logical = true
       // if this is an else-if
       if (IF_RE.test(child.content)) {
         const exp = child.content.replace(IF_RE, '')
@@ -46,6 +51,7 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'if') {
+      logical = true
       if (common.scopedExpression(data, child.pos, child.content)) {
         return html(child, data, location, cb)
       }
@@ -54,6 +60,7 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'while') {
+      logical = true
       let value = ''
       while (common.scopedExpression(data, child.pos, child.content)) {
         value += html(child, data, location, cb)
@@ -62,6 +69,7 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'for') {
+      logical = true
       const parts = child.content.split(IN_RE)
       const object = common.scopedExpression(data, child.pos, parts[1])
       let value = ''
@@ -84,23 +92,33 @@ function html (tree, data, location, cb) {
     }
 
     // anything prefixed with '+' is a mixin call.
-    if (child.tagOrSymbol[0] === '+' && cb) {
+    if (firstLetter === 43 && cb) {
+      logical = true
       const name = child.tagOrSymbol.slice(1)
       if (!mixins[name]) {
         common.die(child.pos, 'TypeError', 'Unknown mixin')
       }
-      return html(mixins[name], data, location, cb)
+
+      const locals = {}
+      const args = Object.keys(child.attributes).map(attr => {
+        return common.scopedExpression(data, child.pos, attr)
+      })
+
+      mixins[name].keys.map((k, index) => (locals[k] = args[index]))
+      const scope = Object.assign({}, data, locals)
+      return html(mixins[name].child, scope, location, cb)
     }
 
     // defines a mixin
-    if (child.tagOrSymbol === 'mixin') {
-      const params = child.content.split(' ')
-      console.log(params)
-      mixins[params[0]] = child
+    if (firstLetter >= 65 && firstLetter <= 90) {
+      logical = true
+      const keys = Object.keys(child.attributes)
+      mixins[child.tagOrSymbol] = { child, keys }
       return ''
     }
 
     if (child.tagOrSymbol === 'include') {
+      logical = true
       // pass location to the cb so inlcudes can be relative
       const path = child.content
       const resolved = cb({ path, location })
@@ -145,7 +163,10 @@ function html (tree, data, location, cb) {
       tag.push('</', props.tagname, '>')
     }
 
-    return tag.join('')
+    var s = tag.join('')
+    // if this is not a logical node, we can make an optimization
+    if (!logical) child.html = s
+    return s
   }
 
   if (tree.children && tree.children.length) {

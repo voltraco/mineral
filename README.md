@@ -89,39 +89,38 @@ Expressions
 
 ### MIXINS
 
-Create mixins
+All html is lowercase, anything starting with an uppercase letter is a mixin.
+Arguments and parens are optional.
 
 ```jade
-.foo
-mixin Person (firstName, lastName)
+Person(firstName, lastName)
   h1= firstName
   h2= lastName
 ```
 
-Use mixins
+Use mixins by putting a `+` before the name of the mixing. Arguments and parens
+are optional.
 
 ```jade
-.person
-  +Person 'Jello', 'Biafra'
++Person('Jello', 'Biafra')
 ```
 
 ### ITERATORS
 
-Iterate over objects or arrays using `each` or `for`.
+Iterate over objects or arrays using `for` (there is no `each` like jade/pug).
+`for` will iterate over and object or array. In this example, `p` is the object
+key, if the value was an array, it would be the current index.
 
 ```jade
 .people
-  mixin Foo(first, last)
+  Foo(first, last)
     .name
       h1.first= first
       h2.last= last
     hr
 
-each p, index in people
-  +Foo(people[index].first, people[index].last)
-
-each p in people
-  +Foo(p.first, p.last)
+for p in people
+  +Foo(people[p].first, people[p].last)
 ```
 
 ```javascript
