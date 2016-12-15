@@ -55,7 +55,7 @@ Person(firstName, lastName)
   h2= lastName
 ```
 
-Use mixins by putting a `+` before the name of the mixing. Arguments and parens
+Use mixins by putting a `+` before the name of the mixin. Arguments and parens
 are optional.
 
 ```jade
@@ -89,17 +89,17 @@ key, if the value was an array, it would be the current index.
       h2.last= last
     hr
 
-for p in people
-  +Foo(people[p].first, people[p].last)
+for person in people
+  +Foo(people[person].first, people[person].last)
 ```
 
 ```javascript
-var node = min({
+{
   people: [
     { first: 'Tom', last: 'Waits' },
     { first: 'Dick', last: 'Dale' }
   ]
-})
+}
 ```
 
 `while` loops
