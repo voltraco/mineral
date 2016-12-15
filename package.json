@@ -26,6 +26,7 @@
     "tape-run": "^2.1.3"
   },
   "dependencies": {
+    "jstransformer": "^1.0.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1"
   }

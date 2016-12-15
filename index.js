@@ -1,15 +1,14 @@
-var api = module.exports = {}
+const api = {}
 api.parse = require('./parser')
 api.compile.html = require('./compilers/html')
 api.compile.dom = require('./compilers/dom')
 
-api.html = s => {
+module.exports = s => {
   const tree = api.parse(s)
-  return (data, loc) => api.compile.html(tree, data, loc)
-}
 
-api.dom = s => {
-  const tree = api.parse(s)
-  return (data, loc) => api.compile.dom(tree, data, loc)
+  return {
+    html: (data, loc) => api.compile.html(tree, data, loc),
+    dom: (data, loc) => api.compile.dom(tree, data, loc)
+  }
 }
 

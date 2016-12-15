@@ -1,23 +1,35 @@
+const transformer = require('jstransformer')
 const common = require('./common')
 const log = require('../log')
+const fmt = require('util').format
 const mixins = {}
 
 const IF_RE = /^\s*if\s*/
 const IN_RE = /\s*in\s*/
 const LINE_COMMENT_RE = /^\/\//
+const FMT_RE = /["'](.*?)["'], /
+const MIN_FILE_RE = /\.min$/
 const EQ_RE = /^\s*=\s*/
 const QUOTE_RE = /^"|'/
 
+const COLON = 58
+const PLUS = 43
+const A = 65
+const Z = 90
+
 // determine if this is a path or just regular content
-function getValue (data, info, str) {
-  if (!EQ_RE.test(str)) return str
-  const exp = str.replace(EQ_RE, '')
-  return common.scopedExpression(data, info, exp)
-}
 
 function html (tree, data, location, cb) {
   let findElseBranch = false
   let logical = false
+
+  function getValue (data, info, str) {
+    if (!EQ_RE.test(str)) return str
+    let exp = str.replace(EQ_RE, '')
+    if (FMT_RE.test(exp)) exp = 'fmt(' + exp + ')'
+    logical = true
+    return common.scopedExpression(data, info, exp)
+  }
 
   function compile(child, index) {
     if (child.html) return child.html
@@ -74,7 +86,7 @@ function html (tree, data, location, cb) {
       const object = common.scopedExpression(data, child.pos, parts[1])
       let value = ''
       common.each(object, function (_value, key) {
-        // create a new shallow scope so that locals dont persist
+        // create a new shallow scope so that locals don't persist
         const locals = { [parts[0]]: key }
         const scope = Object.assign({}, data, locals)
         value += html(child, scope, location, cb)
@@ -82,7 +94,11 @@ function html (tree, data, location, cb) {
       return value
     }
 
-    // treat all piped text as plain content.
+    if (child.tagOrSymbol === 'each') {
+      common.die(child.pos, 'TypeError', 'Each not supported (use for)')
+    }
+
+    // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
       return (' ' + getValue(data, child.pos, child.content))
     }
@@ -91,8 +107,22 @@ function html (tree, data, location, cb) {
       return ''
     }
 
+    if (firstLetter === COLON) {
+      const name = 'jstransformer-' + child.tagOrSymbol.slice(1)
+      let t = null
+      try {
+        t = transformer(require(name))
+      } catch (ex) {
+        common.die(child.pos, 'Error', fmt('%s not installed', name))
+      }
+      const path = child.content
+      const data = cb({ path, location })
+      const parsed = t.render(data.tree, child.attributes)
+      return parsed.body
+    }
+
     // anything prefixed with '+' is a mixin call.
-    if (firstLetter === 43 && cb) {
+    if (firstLetter === PLUS && cb) {
       logical = true
       const name = child.tagOrSymbol.slice(1)
       if (!mixins[name]) {
@@ -110,7 +140,7 @@ function html (tree, data, location, cb) {
     }
 
     // defines a mixin
-    if (firstLetter >= 65 && firstLetter <= 90) {
+    if (firstLetter >= A && firstLetter <= Z) {
       logical = true
       const keys = Object.keys(child.attributes)
       mixins[child.tagOrSymbol] = { child, keys }
@@ -118,11 +148,16 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'include') {
-      logical = true
       // pass location to the cb so inlcudes can be relative
+      logical = true
       const path = child.content
-      const resolved = cb({ path, location })
-      return html(resolved.tree, data, resolved.location, cb)
+
+      // if the include is not a .min extension, it's plain text
+      if (MIN_FILE_RE.test(location)) {
+        const resolved = cb({ path, location }, true)
+        return html(resolved.tree, data, resolved.location, cb)
+      }
+      return cb({ path, location })
     }
 
     //
@@ -177,6 +212,7 @@ function html (tree, data, location, cb) {
 
 module.exports = function (tree, data, location, cb) {
   cb = cb || common.resolveInclude
+  data.fmt = fmt
   return html(tree, data, location, cb)
 }
 

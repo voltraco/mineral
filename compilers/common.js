@@ -36,7 +36,7 @@ exports.resolveTagOrSymbol = function resolveTagOrSymbol (string) {
   return props
 }
 
-exports.resolveInclude = function resolver (info) {
+exports.resolveInclude = function resolver (info, shouldParse) {
   let dirname = info.location || process.cwd()
   let stat = null
 
@@ -53,7 +53,7 @@ exports.resolveInclude = function resolver (info) {
   const text = fs.readFileSync(location, 'utf8')
 
   return {
-    tree: parse(text),
+    tree: shouldParse ? parse(text) : text,
     location: location
   }
 }

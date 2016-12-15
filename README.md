@@ -6,6 +6,7 @@ A simplified fork of the pug/jade template language.
 
 # EXAMPLE
 Here is an example `.min` file, it looks a lot like pug/jade.
+
 ```jade
 html
 body
@@ -16,32 +17,34 @@ body
 ```
 
 # COMMAND LINE USAGE
-```
+
+
+```bash
 $ min example.min -o .
 ```
 
 # MODULE USAGE
+Templates can be parsed, cached and compiled later with locals.
+
 ```js
 const min = require('mineral')
-const strings = ['beep', 'boop']
+const strings = ['glen', 'danzig']
 
-let template = min.dom(`
+let template = min(`
   a(href="/")
   ul
     for name in ${strings}
       li= greeting + name
 `)
 
-const t = template({ greeting: "hello, " })
+const t = template.dom({ greeting: "hello, " })
 
-someNode.appendChild(t) // append to dom or vdom
+body.appendChild(t) // append to dom, vdom, etc.
 ```
 
 # FEATURES
-Aside from parsing the jade syntax and generating source text,
-the following control flow features and extras are currently supported...
 
-### CONTROL-FLOW
+### LOGICAL BRANCHING
 
 `if`, `else if` and `else` statements
 
@@ -54,12 +57,47 @@ else
   p eh, forget about it.
 ```
 
-While loops
+`while` loops
 
 ```jade
 ul
   while x--
     li= x
+```
+
+### ITERATION
+
+Iterate over objects or arrays using `for` (there is no `each` like jade/pug).
+`for` will iterate over and object or array. In this example, `p` is the object
+key, if the value was an array, it would be the current index.
+
+```jade
+.people
+  Foo(first, last)
+    .name
+      h1.first= first
+      h2.last= last
+    hr
+
+for p in people
+  +Foo(people[p].first, people[p].last)
+```
+
+```javascript
+var node = min({
+  people: [
+    { first: 'Tom', last: 'Waits' },
+    { first: 'Dick', last: 'Dale' }
+  ]
+})
+```
+
+### VALUE INSERTION
+Using the `=` symbol indicates that the value should be an expression. An
+expression can include values from the data passed to the template.
+
+```jade
+h1 = 'Hello, ' + name
 ```
 
 ### SCRIPTING
@@ -105,33 +143,6 @@ are optional.
 +Person('Jello', 'Biafra')
 ```
 
-### ITERATORS
-
-Iterate over objects or arrays using `for` (there is no `each` like jade/pug).
-`for` will iterate over and object or array. In this example, `p` is the object
-key, if the value was an array, it would be the current index.
-
-```jade
-.people
-  Foo(first, last)
-    .name
-      h1.first= first
-      h2.last= last
-    hr
-
-for p in people
-  +Foo(people[p].first, people[p].last)
-```
-
-```javascript
-var node = min({
-  people: [
-    { first: 'Tom', last: 'Waits' },
-    { first: 'Dick', last: 'Dale' }
-  ]
-})
-```
-
 ### TEXT
 
 Multiline textblocks
@@ -147,6 +158,22 @@ Single line
 ```jade
 .foobar
   | Hello danzig.
+```
+
+### FILTERS
+Use any [jstramsformer](https://www.npmjs.com/browse/keyword/jstransformer)
+module. For example, `npm install --save jstransformer-marked`. Arguments and
+parens are optional.
+
+```jade
+:marked(gfm=true) ./readme.md
+```
+
+### FORMATTING
+Automatically detects `console.log`-like values.
+
+```jade
+h1 = 'Hello %s', foo
 ```
 
 ### COMMENTS

@@ -1,8 +1,10 @@
 .foo
 
-  Greeting(foo)
-    h1 =foo
+  :marked ./sample.md
 
-  +Greeting('hello')
-  +Greeting
+  Greeting(foo)
+    h1 = 'Hello %s', foo
+
+  +Greeting('Glen')
+  +Greeting('Henry')
 
