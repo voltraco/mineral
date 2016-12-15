@@ -118,6 +118,13 @@ expression can include values from the data passed to the template.
 h1 = 'Hello, ' + name
 ```
 
+### FORMATTING
+Automatically detects `console.log`-like values.
+
+```jade
+h1 = 'Hello %s', foo
+```
+
 ### SCRIPTING
 
 Script tags
@@ -167,13 +174,6 @@ parens are optional.
 
 ```jade
 :marked(gfm=true) ./readme.md
-```
-
-### FORMATTING
-Automatically detects `console.log`-like values.
-
-```jade
-h1 = 'Hello %s', foo
 ```
 
 ### COMMENTS
