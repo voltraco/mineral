@@ -4,7 +4,7 @@ const DELIMITER_RE = /^=/
 const WHITESPACE_RE = /^[^\S\x0a\x0d]*/ // but not new lines
 const ANYSPACE_RE = /^\s*/ // any whitespace
 const NON_WHITESPACE_RE = /^\S+/ // any non whitespace
-const TAGORSYMBOL_RE = /[\.#]?[^(\s]*/ // any valid tag or symbol
+const TAGORSYMBOL_RE = /[\.#]?[^=(\s]*/ // any valid tag or symbol
 const NEWLINE_RE = /[\x0a\x0d]+/ // the next NL
 
 //

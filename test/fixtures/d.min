@@ -3,7 +3,7 @@
   :marked ./sample.md
 
   Greeting(foo)
-    h1 = 'Hello %s', foo
+    h1= 'Hello %s', foo
 
   +Greeting('Glen')
   +Greeting('Henry')

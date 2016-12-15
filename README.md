@@ -1,6 +1,11 @@
 # SYNOPSIS
 A simplified fork of the pug/jade template language.
 
+# MOTIVATION
+The core parts of `pug` (not including 3rd party dependencies) amount to about
+16,700 lines of code (vs mineral about 600). Being so large it can be hard to
+debug. It also has serveral features we never use.
+
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
 
