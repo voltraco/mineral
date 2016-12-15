@@ -57,14 +57,6 @@ else
   p eh, forget about it.
 ```
 
-`while` loops
-
-```jade
-ul
-  while x--
-    li= x
-```
-
 ### ITERATION
 
 Iterate over objects or arrays using `for` (there is no `each` like jade/pug).
@@ -90,6 +82,14 @@ var node = min({
     { first: 'Dick', last: 'Dale' }
   ]
 })
+```
+
+`while` loops
+
+```jade
+ul
+  while x--
+    li= x
 ```
 
 ### VALUE INSERTION
