@@ -44,6 +44,24 @@ body.appendChild(t) // append to dom, vdom, etc.
 
 # FEATURES
 
+### MIXINS
+
+All html is lowercase, anything starting with an uppercase letter is a mixin.
+Arguments and parens are optional.
+
+```jade
+Person(firstName, lastName)
+  h1= firstName
+  h2= lastName
+```
+
+Use mixins by putting a `+` before the name of the mixing. Arguments and parens
+are optional.
+
+```jade
++Person('Jello', 'Biafra')
+```
+
 ### LOGICAL BRANCHING
 
 `if`, `else if` and `else` statements
@@ -123,24 +141,6 @@ Expressions
 
 ```jade
   h1= 'number of times: ' + 100 + 'x'
-```
-
-### MIXINS
-
-All html is lowercase, anything starting with an uppercase letter is a mixin.
-Arguments and parens are optional.
-
-```jade
-Person(firstName, lastName)
-  h1= firstName
-  h2= lastName
-```
-
-Use mixins by putting a `+` before the name of the mixing. Arguments and parens
-are optional.
-
-```jade
-+Person('Jello', 'Biafra')
 ```
 
 ### TEXT
