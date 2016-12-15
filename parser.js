@@ -33,16 +33,21 @@ module.exports = function Parser (source) {
   let lastIndent = 0
   let lastSibling = null
   let contentTarget = null
+  let contentTargetIndent = 0
 
   while (lexer.length()) {
     const whitespace = lexer.match.whitespace()
     lexer.match.comment()
 
     if (contentTarget) {
-      if (whitespace.length <= lastIndent) {
+      if (whitespace.length <= contentTargetIndent) {
+        contentTarget.content = contentTarget.content.slice(0, -1)
         contentTarget = null
       } else {
-        contentTarget.content += lexer.match.content()
+        // add newlines and whitespace, but trim to the current indent.
+        const trimmed = whitespace.slice(contentTargetIndent + 2)
+        contentTarget.content += trimmed + lexer.match.content()
+        contentTarget.content += (lexer.match.newline() || '')
         continue
       }
     }
@@ -66,18 +71,19 @@ module.exports = function Parser (source) {
         content: lexer.match.content(),
         indent: indent,
         children: [],
-        parent: parent,
         pos: lexer.pos()
       }
 
       if (tagOrSymbol.slice(-1) === '.') {
         tag.tagOrSymbol = tagOrSymbol.slice(0, -1)
+        tag.unescaped = true
         contentTarget = tag
+        contentTargetIndent = indent
       }
 
       if (indent > lastIndent) {
-        (lastSibling || parent).children.push(tag)
-        lastSibling = null
+        tag.parent = (lastSibling || parent)
+        tag.parent.children.push(tag)
         parent = tag
       } else if (indent < lastIndent) {
         while (parent && parent.indent >= indent) {

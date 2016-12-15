@@ -1,4 +1,5 @@
 const transformer = require('jstransformer')
+const he = require('he')
 const common = require('./common')
 const log = require('../log')
 const fmt = require('util').format
@@ -14,6 +15,7 @@ const QUOTE_RE = /^"|'/
 
 const COLON = 58
 const PLUS = 43
+const HYPHEN = 45
 const A = 65
 const Z = 90
 
@@ -28,11 +30,19 @@ function html (tree, data, location, cb) {
     let exp = str.replace(EQ_RE, '')
     if (FMT_RE.test(exp)) exp = 'fmt(' + exp + ')'
     logical = true
-    return common.scopedExpression(data, info, exp)
+    return he.escape(common.scopedExpression(data, info, exp))
   }
 
   function compile(child, index) {
     if (child.html) return child.html
+
+    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
+      return ''
+    }
+
+    if (child.unescaped) {
+      child.content = he.escape(child.content)
+    }
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
     //
@@ -103,11 +113,12 @@ function html (tree, data, location, cb) {
       return (' ' + getValue(data, child.pos, child.content))
     }
 
-    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
-      return ''
+    if (firstLetter === HYPHEN) {
+      common.die(child.pos, 'Error', 'No inline code!')
     }
 
-    if (firstLetter === COLON) {
+    if (firstLetter === COLON && cb) {
+      logical = true
       const name = 'jstransformer-' + child.tagOrSymbol.slice(1)
       let t = null
       try {

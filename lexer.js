@@ -145,6 +145,11 @@ module.exports = function Lexer (str, options) {
 
         ch = lexer.peek()
 
+        if (NEWLINE_RE.test(ch)) {
+          lexer.pop()
+          continue
+        }
+
         if (ch === '(') {
           ++open
         } else if (ch === ')') {
@@ -177,10 +182,10 @@ module.exports = function Lexer (str, options) {
       if (ch === '\'') openSingle = !openSingle
       if (ch === '"') openDouble = !openDouble
 
+      value += ch
+
       if (!openSingle && !openDouble &&
         (/ |,/.test(ch) || !lexer.length())) break
-
-      value += ch
     }
 
     if (value === '') lexer.error('Expected value')

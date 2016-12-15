@@ -1,0 +1,38 @@
+html
+head
+  link(
+    href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Code+Pro|Source+Sans+Pro"
+    rel="stylesheet"
+  )
+  style
+    :stylus ./index.styl
+body
+  img(width="50px" height="50px" src="./logo.svg")
+  h1 mineral
+  p mineral is a template language, similar to 
+    a(href="https://pugjs.org") pug
+    | . its goal is to be a fraction the size of pug, and to provide only a
+    | subset of language features.
+
+    h2 layout
+    p a readable, terse, representation of html
+    pre.input
+      code.
+        html
+        head
+          link(href="index.css" rel="stylesheet")
+        body
+          h1 Hello World
+
+    pre.input
+      code.
+        <html>
+        <head>
+          <link href="index.css" rel="stylesheet">
+        </head>
+        <body>
+          <h1>Hello World</h1>
+        </body>
+
+    h2 stuff
+

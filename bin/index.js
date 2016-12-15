@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const log = require('../log')
 const argv = require('minimist')(process.argv.slice(2))
 const mkdirp = require('mkdirp')
 
@@ -48,7 +49,8 @@ if (argv.d) {
 argv._.map(file => {
   const location = path.dirname(file)
   const source = fs.readFileSync(file, 'utf8')
-  const html = compilers.html(parse(source), data, location)
+  const tree = parse(source)
+  const html = compilers.html(tree, data, location)
 
   if (!argv.o) {
     process.stdout.write(html + '\n')
@@ -59,6 +61,7 @@ argv._.map(file => {
     )
     mkdirp.sync(out)
     try {
+      file = file.replace(/\.min$/, '.html')
       fs.writeFileSync(path.join(out, path.basename(file)), html)
     } catch (ex) {
       console.error(ex)
