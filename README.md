@@ -4,7 +4,8 @@ A simplified fork of the pug/jade template language.
 # MOTIVATION
 The core parts of `pug` (not including 3rd party dependencies) amount to about
 16,700 lines of code (vs mineral about 600). Being so large it can be hard to
-debug. It also has serveral features we never use.
+debug. It also has serveral features we never use. We also wanted something
+that was intended to fit with modern frameworks like react, preact or choo.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
@@ -94,8 +95,11 @@ key, if the value was an array, it would be the current index.
       h2.last= last
     hr
 
-for person in people
-  +Foo(people[person].first, people[person].last)
+for key, val in people
+  +Foo(val.first, val.last)
+
+for p in people
+  +Foo(people[p].first, people[p].last)
 ```
 
 ```javascript
