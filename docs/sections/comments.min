@@ -1,4 +1,4 @@
-a(id="text" href="#comments")
+a(id="comments" href="#comments")
   h2 comments
 p Single-line
 

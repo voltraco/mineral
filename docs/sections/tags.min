@@ -1,9 +1,10 @@
 a(id="tags" href="#tags")
   h2 tags
 
-p Text at the start of a line (or after only white space) is considered an html
+p text at the start of a line (or after only white space) is considered an html
   | tag. Indenting a tag will nest it, creating the tree-like structure that
-  | can be rendered into html.
+  | can be rendered into html. tag attributes look similar to html (with
+  | optional comma), but their values are regular JavaScript.
 
 pre.input
   code.
