@@ -4,7 +4,9 @@
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "bin": "bin/min",
-  "scripts": {},
+  "scripts": {
+    "build": "./bin/min ./docs/index.min -o ./docs"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voltraco/mineral.git"

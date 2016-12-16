@@ -1,7 +1,9 @@
 a(id="tags" href="#tags")
   h2 tags
 
-p a readable, terse, representation of html
+p Text at the start of a line (or after only white space) is considered an html
+  | tag. Indenting a tag will nest it, creating the tree-like structure that
+  | can be rendered into html.
 
 pre.input
   code.
