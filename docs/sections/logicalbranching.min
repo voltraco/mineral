@@ -1,0 +1,13 @@
+a(id="branching", href="#branching")
+  h2 logical branching
+
+p `if`, `else if` and `else` statements.
+
+  pre.input
+    code.
+      if foo
+        p The variable `foo` is truthy
+      else if bar
+        p The variable `bar` is truthy
+      else
+        p eh, forget about it.

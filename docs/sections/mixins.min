@@ -1,0 +1,18 @@
+a(id="mixins" href="#mixins")
+  h2 mixins
+
+p all html is lowercase, anything starting with an uppercase letter is a
+  | mixin. Arguments and parens are optional.
+
+  pre.input
+    code.
+      Person(firstName, lastName)
+        h1= firstName
+        h2= lastName
+
+p use mixins by putting a `+` before the name of the mixin. Arguments and
+  | parens are optional.
+
+  pre.input
+    code.
+      +Person('Jello', 'Biafra')

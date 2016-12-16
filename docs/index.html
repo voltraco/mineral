@@ -12,6 +12,9 @@ h4 {
 h1 {
   font-size: 2.5em;
 }
+h2 {
+  margin-top: 100px;
+}
 a,
 a:visited,
 .red {
@@ -21,6 +24,7 @@ a {
   text-decoration: none;
   padding-bottom: 2px;
   border-bottom: 1px;
+  outline: none;
 }
 p {
   line-height: 23px;
@@ -35,17 +39,74 @@ pre {
   position: relative;
   padding: 10px;
   background-color: #fafafa;
+  border-bottom: 1px solid #d5d5d5;
 }
-</style></head><body><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1><p>mineral is a template language, similar to <a href="https://pugjs.org">pug</a> . its goal is to be a fraction the size of pug, and to provide only a subset of language features.<h2>layout</h2><p>a readable, terse, representation of html</p><pre class="input"><code>html
+</style></head><body><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative, with significantly smaller codebase and subset of features.<a id="tags" href="#tags"><h2>tags</h2></a><p>a readable, terse, representation of html</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
   h1 Hello World
-</code></pre><pre class="input"><code>&lt;html&gt;
+</code></pre><p>the above code will produce the following html</p><pre class="output"><code>&lt;html&gt;
 &lt;head&gt;
   &lt;link href=&quot;index.css&quot; rel=&quot;stylesheet&quot;&gt;
 &lt;/head&gt;
 &lt;body&gt;
   &lt;h1&gt;Hello World&lt;/h1&gt;
 &lt;/body&gt;
-</code></pre><h2>stuff</h2></p>
+</code></pre><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional.<pre class="input"><code>Person(firstName, lastName)
+  h1= firstName
+  h2= lastName
+</code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
+</code></pre></p><a id="branching", href="#branching"><h2>logical branching</h2></a><p>`if`, `else if` and `else` statements.<pre class="input"><code>if foo
+  p The variable &#x60;foo&#x60; is truthy
+else if bar
+  p The variable &#x60;bar&#x60; is truthy
+else
+  p eh, forget about it.
+</code></pre></p><a id="iteration" href="iteration"><h2>iteration</h2></a><p>Iterate over objects or arrays using `for` (there is no `each` like jade/pug). `for` will iterate over and object or array. In this example, `p` is the object key, if the value was an array, it would be the current index.</p><pre class="input"><code>{
+  people: [
+    { first: &#x27;Tom&#x27;, last: &#x27;Waits&#x27; },
+    { first: &#x27;Dick&#x27;, last: &#x27;Dale&#x27; }
+  ]
+}
+</code></pre><pre class="input"><code>for key, val in people
+  +Foo(val.first, val.last)
+</code></pre><pre class="input"><code>for p in people
+  +Foo(people[p].first, people[p].last)
+</code></pre><p>`while` loops</p><pre class="input"><code>ul
+  while x--
+    li= x
+
+</code></pre><a id="values" href="#values"><h2>dynamic values</h2></a><p>Using the `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any other valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
+</code></pre><p>Automatically detects `console.log`-like values.</p><pre class="input"><code>h1 = &#x27;Hello %s&#x27;, foo
+
+
+</code></pre><a id="text" href="#text"><h2>text</h2></a><p>To continue the text content of a tag, you can use the `|` symbol.</p><pre class="input"><code>p Danzig is an American heavy metal band, formed in 1987 in Lodi,
+| New Jersey, United States. The band is the musical outlet for singer
+| and songwriter Glenn Danzig, preceded by the horror punk bands the
+| Misfits and Samhain. They play in a bluesy doom-driven heavy metal
+| style influenced by the early sound of Black Sabbath.[1]
+</code></pre><p>Multiline textblocks, adding a `.` after the tag will indicate to the compiler that all whitespace should be preserved and that text should not be evaluated.</p><pre class="input"><code>.foo.
+  Hello
+  world.
+</code></pre><pre class="output"><code>&lt;div class=&quot;foo&quot;&gt;
+  Hello
+  world.
+&lt;/div&gt;
+</code></pre><p>This feature is relevant when adding javascript to a script tag.</p><pre class="input"><code>script.
+  var s = &#x27;hello, world&#x27;
+  alert(s)
+h1 I sent you an alert.
+
+
+</code></pre><a id="text" href="#filters"><h2>filters</h2></a><p>Use any <a href="https://www.npmjs.com/browse/keyword/jstransformer">jstramsformer</a> module. For example, `npm install --save jstransformer-marked`. Arguments and parens are optional.</p><pre class="input"><code>:marked(gfm=true) ./readme.md
+
+
+</code></pre><a id="text" href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>
+</code></pre><p>Multi-line (`.beep` and `.boop` are commented)</p><pre class="input"><code>.foo1
+
+  .beep
+    .boop
+.foo2
+
+</code></pre></p>

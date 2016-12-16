@@ -9,30 +9,17 @@ head
 body
   img(width="50px" height="50px" src="./logo.svg")
   h1 mineral
-  p mineral is a template language, similar to 
+  p mineral is a language that compiles to markup. It's similar to Jade (aka 
     a(href="https://pugjs.org") pug
-    | . its goal is to be a fraction the size of pug, and to provide only a
-    | subset of language features.
+    | ). its goal is to be a light-weight alternative, with significantly
+    | smaller codebase and subset of features.
 
-    h2 layout
-    p a readable, terse, representation of html
-    pre.input
-      code.
-        html
-        head
-          link(href="index.css" rel="stylesheet")
-        body
-          h1 Hello World
-
-    pre.input
-      code.
-        <html>
-        <head>
-          <link href="index.css" rel="stylesheet">
-        </head>
-        <body>
-          <h1>Hello World</h1>
-        </body>
-
-    h2 stuff
+    include ./sections/tags.min
+    include ./sections/mixins.min
+    include ./sections/logicalbranching.min
+    include ./sections/iteration.min
+    include ./sections/values.min
+    include ./sections/text.min
+    include ./sections/filters.min
+    include ./sections/comments.min
 

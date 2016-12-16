@@ -1,0 +1,18 @@
+a(id="text" href="#comments")
+  h2 comments
+p Single-line
+
+pre.input
+  code.
+    // single line
+
+p Multi-line (`.beep` and `.boop` are commented)
+
+pre.input
+  code.
+    .foo1
+    //
+      .beep
+        .boop
+    .foo2
+

@@ -1,0 +1,23 @@
+a(id="tags" href="#tags")
+  h2 tags
+
+p a readable, terse, representation of html
+
+pre.input
+  code.
+    html
+    head
+      link(href="index.css" rel="stylesheet")
+    body
+      h1 Hello World
+
+p the above code will produce the following html
+pre.output
+  code.
+    <html>
+    <head>
+      <link href="index.css" rel="stylesheet">
+    </head>
+    <body>
+      <h1>Hello World</h1>
+    </body>

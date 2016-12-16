@@ -37,12 +37,12 @@ function html (tree, data, location, cb) {
   function compile(child, index) {
     if (child.html) return child.html
 
-    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
-      return ''
-    }
-
     if (child.unescaped) {
       child.content = he.escape(child.content)
+    }
+
+    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
+      return ''
     }
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
@@ -177,7 +177,7 @@ function html (tree, data, location, cb) {
       const path = child.content
 
       // if the include is not a .min extension, it's plain text
-      if (MIN_FILE_RE.test(location)) {
+      if (MIN_FILE_RE.test(path)) {
         const resolved = cb({ path, location }, true)
         return html(resolved.tree, data, resolved.location, cb)
       }

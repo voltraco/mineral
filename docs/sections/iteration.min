@@ -1,0 +1,34 @@
+a(id="iteration" href="iteration")
+  h2 iteration
+
+p Iterate over objects or arrays using `for` (there is no `each` like
+  | jade/pug). `for` will iterate over and object or array. In this
+  | example, `p` is the object key, if the value was an array, it would be
+  | the current index.
+
+pre.input
+  code.
+    {
+      people: [
+        { first: 'Tom', last: 'Waits' },
+        { first: 'Dick', last: 'Dale' }
+      ]
+    }
+
+pre.input
+  code.
+    for key, val in people
+      +Foo(val.first, val.last)
+
+pre.input
+  code.
+    for p in people
+      +Foo(people[p].first, people[p].last)
+
+p `while` loops
+pre.input
+  code.
+    ul
+      while x--
+        li= x
+
