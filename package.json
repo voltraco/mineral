@@ -1,6 +1,6 @@
 {
   "name": "mineral",
-  "version": "3.0.0",
+  "version": "3.0.0-beta1",
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "bin": "bin/min",
