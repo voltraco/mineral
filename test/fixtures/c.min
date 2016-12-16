@@ -12,7 +12,7 @@ body
   else if a.val === 26
     h2 N26
   else
-    h2 https://foobar.com
+    h2 https://quxx.com
 
   span xy // comment!
 
@@ -22,7 +22,10 @@ body
   for i in arr
     span =arr[i]
 
-  mixin Greeting
+  for k, val in { a: 1, b: 2 }
+    p= '%s = %s' k, val
+
+  Greeting
     h1 Hello, World.
 
   include ./a/a.min

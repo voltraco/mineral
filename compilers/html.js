@@ -30,7 +30,8 @@ function html (tree, data, location, cb) {
     let exp = str.replace(EQ_RE, '')
     if (FMT_RE.test(exp)) exp = 'fmt(' + exp + ')'
     logical = true
-    return he.escape(common.scopedExpression(data, info, exp))
+    const value = common.scopedExpression(data, info, exp)
+    return he.escape(value + '')
   }
 
   function compile(child, index) {
@@ -92,12 +93,24 @@ function html (tree, data, location, cb) {
 
     if (child.tagOrSymbol === 'for') {
       logical = true
+
       const parts = child.content.split(IN_RE)
+      if (!parts[0]) common.die(child.pos, 'TypeError', 'Unknown mixin')
+
       const object = common.scopedExpression(data, child.pos, parts[1])
+
       let value = ''
-      common.each(object, function (_value, key) {
+      common.each(object, function (val, key) {
+        // determine if there are identifiers for key and value
+        const identifiers = parts[0].split(',')
+        const keyIdentifier = identifiers[0]
+        const valIdentifier = identifiers[1]
+        const locals = { [keyIdentifier]: key }
+
+        if (valIdentifier) {
+          locals[valIdentifier] = val
+        }
         // create a new shallow scope so that locals don't persist
-        const locals = { [parts[0]]: key }
         const scope = Object.assign({}, data, locals)
         value += html(child, scope, location, cb)
       })
