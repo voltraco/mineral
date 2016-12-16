@@ -1,9 +1,9 @@
 const transformer = require('jstransformer')
 const he = require('he')
 const common = require('./common')
-const log = require('../log')
 const fmt = require('util').format
-const mixins = {}
+
+global.cache = {}
 
 const IF_RE = /^\s*if\s*/
 const IN_RE = /\s*in\s*/
@@ -149,7 +149,7 @@ function html (tree, data, location, cb) {
     if (firstLetter === PLUS && cb) {
       logical = true
       const name = child.tagOrSymbol.slice(1)
-      if (!mixins[name]) {
+      if (!global.cache[name]) {
         common.die(child.pos, 'TypeError', 'Unknown mixin')
       }
 
@@ -158,23 +158,27 @@ function html (tree, data, location, cb) {
         return common.scopedExpression(data, child.pos, attr)
       })
 
-      mixins[name].keys.map((k, index) => (locals[k] = args[index]))
+      global.cache[name].keys.map((k, index) => (locals[k] = args[index]))
       const scope = Object.assign({}, data, locals)
-      return html(mixins[name].child, scope, location, cb)
+      return html(global.cache[name].child, scope, location, cb)
     }
 
     // defines a mixin
     if (firstLetter >= A && firstLetter <= Z) {
       logical = true
       const keys = Object.keys(child.attributes)
-      mixins[child.tagOrSymbol] = { child, keys }
+      global.cache[child.tagOrSymbol] = { child, keys }
       return ''
     }
 
     if (child.tagOrSymbol === 'include') {
-      // pass location to the cb so inlcudes can be relative
+      // pass location to the cb so includes can be relative
       logical = true
       const path = child.content
+
+      if (global.watcher) {
+        global.addToWatcher(location, path)
+      }
 
       // if the include is not a .min extension, it's plain text
       if (MIN_FILE_RE.test(path)) {

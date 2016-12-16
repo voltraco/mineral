@@ -1,15 +1,15 @@
 const fs = require('fs')
 const path = require('path')
-const log = require('../log')
-const argv = require('minimist')(process.argv.slice(2))
+const minimist = require('minimist')
 const mkdirp = require('mkdirp')
+const chokidar = require('chokidar')
+const chalk = require('chalk')
 
+const compiler = require('../compilers/html')
 const parse = require('../parser')
 const readdirSync = require('./readdirsync')
 
-const compilers = {}
-compilers.html = require('../compilers/html')
-compilers.dom = require('../compilers/dom')
+const argv = minimist(process.argv.slice(2))
 
 if (argv.h) {
   console.log(`
@@ -17,6 +17,7 @@ if (argv.h) {
       min FILE1, ... [options]
 
     Options:
+      -w           Watch for changes and recompile
       -o DIR       Output directory
       -d '...'     A string of JSON, used as locals
       --data FILE  A path to a JSON file to use as locals
@@ -43,30 +44,76 @@ if (argv.d) {
   }
 }
 
-// TODO: get a pre-cache all mixins
-//const sources = readdirSync(path.dirname(argv._[0]))
+const deps = {}
+const recent = []
 
-argv._.map(file => {
+const log = (symbol, event, s, ...args) => {
+  const msg = [chalk.white(symbol), chalk.blue(event), s]
+  console.log(msg.join(' '), ...args)
+}
+
+// TODO: get a pre-cache all mixins
+
+function compile (file) {
+
+  const original = file
+  if (deps[file]) file = deps[file]
+
+  file = path.resolve(file)
   const location = path.dirname(file)
   const source = fs.readFileSync(file, 'utf8')
   const tree = parse(source)
-  const html = compilers.html(tree, data, location)
+  const html = compiler(tree, data, file)
 
   if (!argv.o) {
     process.stdout.write(html + '\n')
   } else {
-    var out = path.join(
+    const out = path.join(
       path.resolve(location),
       path.relative(location, argv.o)
     )
     mkdirp.sync(out)
     try {
       file = file.replace(/\.min$/, '.html')
-      fs.writeFileSync(path.join(out, path.basename(file)), html)
+      const dest = path.join(out, path.basename(file))
+      fs.writeFileSync(dest, html)
+      log(' ✓ ', 'compiled', original)
     } catch (ex) {
       console.error(ex)
       process.exit(1)
     }
   }
-})
+}
+const files = argv._
 
+files.map(compile)
+
+if (argv.w) {
+
+  global.watcher = chokidar
+    .watch(files, { persistent: true, atomic: true })
+    .on('add', path => compile(path))
+    .on('change', path => compile(path))
+    .on('unlink', path => compile(path))
+    .on('addDir', path => compile(path))
+    .on('unlinkDir', path => compile(path))
+
+  global.addToWatcher = (origin, p) => {
+    const target = path.resolve(path.dirname(origin), p)
+    if (deps[target]) return
+
+    deps[target] = origin
+    watcher.add(target)
+    log(' · ', 'watching', '%s -> %s', origin, target)
+  }
+
+  function onReady() {
+    const watched = watcher.getWatched()
+    Object.keys(watched).map(p => watched[p].map(f => {
+      const target = path.join(p, f)
+      log(' · ', 'watching', target)
+    }))
+  }
+
+  global.watcher.on('ready', onReady)
+}
