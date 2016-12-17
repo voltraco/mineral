@@ -1,5 +1,6 @@
 a(id="comments" href="#comments")
   h2 comments
+
 p Single-line
 
 pre.input
@@ -16,3 +17,15 @@ pre.input
         .boop
     .foo2
 
+p
+  span.red note
+  | comments have no business in compiled code, so unlike jade/pug they are
+  | completely removed. Conditional comments are no longer supported by any IE
+  | version. If for some reason you really want comments, you can use the
+  | comment tag.
+pre.input
+  code.
+    comment Hey good lookin'
+pre.output
+  code.
+    <!-- Hey good lookin' -->

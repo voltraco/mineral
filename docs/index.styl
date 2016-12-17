@@ -1,3 +1,7 @@
+$red = #ff5252
+$gray = #333
+$lightgray = rgba(0,0,0,0.14)
+
 body
   font-family 'Open Sans', sans-serif
   font-size 1em
@@ -8,12 +12,21 @@ h1, h2, h3, h4
 
 h1
   font-size 2.5em
+  vertical-align bottom
+  margin-left 20px
+  display inline
 
 h2
+  border 2px solid $red
+  padding 4px 8px 5px 8px
+  display inline-block
+  text-transform uppercase
+  letter-spacing .05em
+  font-size 1em
   margin-top 100px
 
 a, a:visited, .red
-  color #ff5252
+  color $red
 
 a
   text-decoration none
@@ -23,6 +36,9 @@ a
 
 p
   line-height 23px
+
+  &:first-of-type
+    margin 100px 0 50px 0
 
 pre, code
   font-family 'Source Code Pro', monospace
@@ -36,3 +52,29 @@ pre
   border-bottom 1px solid #d5d5d5
   &.warn
     border-bottom 1px solid red
+
+nav
+  z-index 10
+  position fixed
+  top 0
+  left 0
+  right 0
+  height 60px
+  background white
+  border-bottom 1px solid $lightgray
+  box-shadow 0px 2px 3px $lightgray
+
+  ul
+    margin-right 10px
+    list-style none
+    li
+      float right
+
+  a, a:visited
+    color $gray
+    font-size 12px
+    text-transform uppercase
+    margin 14px
+    text-decoration none
+    &:hover
+      color $red

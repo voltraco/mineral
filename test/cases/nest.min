@@ -1,0 +1,13 @@
+.a
+  .aa
+  .ab
+    .aba
+      .abab
+        .ababa
+  .ac
+.b
+  .ba
+    .baa
+  .bb
+  .bc
+

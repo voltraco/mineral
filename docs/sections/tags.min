@@ -1,33 +1,47 @@
-a(id="tags" href="#tags")
-  h2 tags
 
-p text at the start of a line (or after only white space) is considered an html
-  | tag. Indenting a tag will nest it, creating the tree-like structure that
-  | can be rendered into html. tag attributes look similar to html (with
-  | optional comma), but their values are regular JavaScript.
 
-pre.input
-  code.
-    html
-    head
-      link(href="index.css" rel="stylesheet")
-    body
-      h1 Hello World
+section(id="tags")
 
-p the above code will produce the following html
-pre.output
-  code.
-    <html>
-    <head>
-      <link href="index.css" rel="stylesheet">
-    </head>
-    <body>
-      <h1>Hello World</h1>
-    </body>
+  .pre
+    h2 tags
 
-p 
-  span.red note
-  | mineral does not support class-after-attribute syntax.
-pre.warn
-  code.
-    a(href='/save').button save
+  p lowercase text at the start of a line (or after only white space) is
+    | considered an html tag. Indenting a tag will nest it, creating the
+    | tree-like structure that can be rendered into html. tag attributes
+    | look similar to html (with optional comma), but their values are regular
+    | JavaScript.
+
+  pre.input
+    code.
+      html
+      head
+        link(href="index.css" rel="stylesheet")
+      body
+        h1 Hello World
+
+  p the above code will produce the following html
+  pre.output
+    code.
+      <html>
+      <head>
+        <link href="index.css" rel="stylesheet">
+      </head>
+      <body>
+        <h1>Hello World</h1>
+      </body>
+
+  p
+    span.red note
+    | it's ideal to disambiguate expressions or declarations when using them as
+    | attribute values.
+  pre.warn
+    code.
+      a(href='/save' date=(new Date()))
+
+  p
+    span.red note
+    | mineral does not support the (rather superfluous) class-after-attribute
+    | syntax.
+  pre.warn
+    code.
+      a(href='/save').button save

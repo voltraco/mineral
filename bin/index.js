@@ -66,6 +66,7 @@ function compileFile (file) {
 
   const sourcefile = path.resolve(file)
   const source = fs.readFileSync(sourcefile, 'utf8')
+  // console.log(require('util').inspect(parse(source), { colors: true, depth: null }))
   const html = compile(parse(source), data, sourcefile)
 
   if (!argv.o) {

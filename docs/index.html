@@ -11,8 +11,17 @@ h4 {
 }
 h1 {
   font-size: 2.5em;
+  vertical-align: bottom;
+  margin-left: 20px;
+  display: inline;
 }
 h2 {
+  border: 2px solid #ff5252;
+  padding: 4px 8px 5px 8px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 1em;
   margin-top: 100px;
 }
 a,
@@ -29,6 +38,9 @@ a {
 p {
   line-height: 23px;
 }
+p:first-of-type {
+  margin: 100px 0 50px 0;
+}
 pre,
 code {
   font-family: 'Source Code Pro', monospace;
@@ -44,7 +56,37 @@ pre {
 pre.warn {
   border-bottom: 1px solid #f00;
 }
-</style></head><body><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative to pug. a significantly smaller codebase, a slimmer set of features and the ability to output dom elements as well as html.<a id="tags" href="#tags"><h2>tags</h2></a><p>text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
+nav {
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.14);
+  box-shadow: 0px 2px 3px rgba(0,0,0,0.14);
+}
+nav ul {
+  margin-right: 10px;
+  list-style: none;
+}
+nav ul li {
+  float: right;
+}
+nav a,
+nav a:visited {
+  color: #333;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin: 14px;
+  text-decoration: none;
+}
+nav a:hover,
+nav a:visited:hover {
+  color: #ff5252;
+}
+</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><ul><li><a href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li></ul></nav><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative to pug. a significantly smaller codebase, a slimmer set of features and the ability to output dom elements as well as html.<section id="tags"><div class="pre"></div><h2>tags</h2><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
@@ -56,12 +98,13 @@ body
 &lt;body&gt;
   &lt;h1&gt;Hello World&lt;/h1&gt;
 &lt;/body&gt;
-</code></pre><p><span class="red">note</span> mineral does not support class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
-</code></pre><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
+</code></pre><p><span class="red">note</span> it's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
+</code></pre><p><span class="red">note</span> mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
+</code></pre></section><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
   h1= firstName
   h2= lastName
 </code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
-</code></pre></p><a id="conditionals", href="#conditionals"><h2>conditionals</h2></a><p>conditional statements (`if`, `else if` and `else`) have no parenthesis. they will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
+</code></pre></p><a id="conditionals" href="#conditionals"><h2>conditionals</h2></a><p>conditional statements (`if`, `else if` and `else`) have no parenthesis. they will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
   p this statement is false
 else if 100 &gt; 99
   p this statement is also false, and optional
@@ -110,5 +153,5 @@ h1 I sent you an alert.
   .beep
     .boop
 .foo2
-
+</code></pre><p><span class="red">note</span> comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
 </code></pre></p>

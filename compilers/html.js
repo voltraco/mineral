@@ -41,9 +41,9 @@ function html (tree, data, location, cb) {
       child.content = he.escape(child.content)
     }
 
-    if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
-      return ''
-    }
+    //if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
+    //  return ''
+    //}
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
     //
@@ -71,6 +71,10 @@ function html (tree, data, location, cb) {
     if (findElseBranch) {
       if (index == tree.children.length - 1) throw new Error('missing else')
       return ''
+    }
+
+    if (child.tagOrSymbol === 'comment') {
+      return '<!-- ' + child.content + ' -->'
     }
 
     if (child.tagOrSymbol === 'if') {
@@ -195,12 +199,13 @@ function html (tree, data, location, cb) {
 
     let tag = ['<', props.tagname]
 
-    if (props.classname.length) {
+    if (props.classname) {
       tag.push(' class="', props.classname, '"')
     }
 
     if (child.attributes) {
-      const attrs = Object.keys(child.attributes).map(key => {
+      let attrs = Object.keys(child.attributes).map(key => {
+
         let value = child.attributes[key]
 
         // if this attribute is a boolean, make its value its key
@@ -209,13 +214,22 @@ function html (tree, data, location, cb) {
         }
 
         if (value) {
+          // all values are expressions
           value = common.scopedExpression(data, child.pos, value)
+
+          // a class should not be empty
+          if (key === 'class' && !value) return ''
+
+          // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
             value = he.escape(JSON.stringify(value))
+          } else {
+            value = JSON.stringify(value)
           }
         }
         return [key, '=', value].join('')
       })
+      attrs = attrs.filter(a => !!a)
       if (attrs.length) tag.push(' ', attrs.join(' '))
     }
 
@@ -249,6 +263,7 @@ function html (tree, data, location, cb) {
 
 module.exports = function (tree, data, location, cb) {
   cb = cb || common.resolveInclude
+  data = data || {}
   data.fmt = fmt
   return html(tree, data, location, cb)
 }

@@ -206,7 +206,6 @@ module.exports = function Lexer (str, options) {
         break
       }
       value += ch
-
       if (!lexer.length()) break
     }
     return value

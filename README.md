@@ -2,16 +2,16 @@
 A simplified fork of the pug/jade template language.
 
 # MOTIVATION
-The core parts of `pug` (not including 3rd party dependencies) amount to about
-16,700 lines of code (vs mineral about 600). Being so large it can be hard to
-debug. It also has serveral features we never use. We also wanted something
-that was intended to fit with modern frameworks like react, preact or choo.
+Mineral is a language that compiles to markup. It's similar to Jade (aka
+[pug](https://pugjs.org). Its goal is to be a light-weight alternative to pug.
+A significantly smaller codebase, a slimmer set of features, some improvements
+and the ability to output dom trees as well as html.
 
 # BUILD
 [![Build Status](https://travis-ci.org/voltraco/mineral.svg)](https://travis-ci.org/voltraco/mineral)
 
 # EXAMPLE
-Here is an example `.min` file, it looks a lot like pug/jade.
+Here is an example `.min` file, it looks a lot like jade/pug.
 
 ```jade
 html

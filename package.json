@@ -1,10 +1,11 @@
 {
   "name": "mineral",
-  "version": "3.0.0-beta1",
+  "version": "3.0.0-beta2",
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "bin": "bin/min",
   "scripts": {
+    "test": "node test/cases.js",
     "build": "./bin/min ./docs/index.min -o ./docs"
   },
   "repository": {
@@ -25,7 +26,7 @@
     "jade": "^1.11.0",
     "json-stringify-safe": "^5.0.1",
     "jstransformer-stylus": "^1.3.0",
-    "tape": "^4.5.1",
+    "tape": "^4.6.3",
     "tape-run": "^2.1.3"
   },
   "dependencies": {
@@ -33,7 +34,6 @@
     "he": "^1.1.0",
     "jstransformer": "^1.0.0",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1",
-    "onchange": "^3.2.0"
+    "mkdirp": "^0.5.1"
   }
 }

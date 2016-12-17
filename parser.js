@@ -83,6 +83,7 @@ module.exports = function Parser (source) {
       if (indent > lastIndent) {
         tag.parent = (lastSibling || parent)
         tag.parent.children.push(tag)
+        lastSibling = null
         parent = tag
       } else if (indent < lastIndent) {
         while (parent && parent.indent >= indent) {
