@@ -13,5 +13,3 @@ p Automatically detects `console.log`-like values.
 pre.input
   code.
     h1 = 'Hello %s', foo
-
-

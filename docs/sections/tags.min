@@ -24,3 +24,10 @@ pre.output
     <body>
       <h1>Hello World</h1>
     </body>
+
+p 
+  span.red note
+  | mineral does not support class-after-attribute syntax.
+pre.warn
+  code.
+    a(href='/save').button save

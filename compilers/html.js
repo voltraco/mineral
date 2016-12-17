@@ -202,8 +202,17 @@ function html (tree, data, location, cb) {
     if (child.attributes) {
       const attrs = Object.keys(child.attributes).map(key => {
         let value = child.attributes[key]
-        if (!QUOTE_RE.test(value.trim())) {
-          value = getValue(data, child.pos, value)
+
+        // if this attribute is a boolean, make its value its key
+        if (typeof value === 'boolean') {
+          return [key, '=', `"${key}"`].join('')
+        }
+
+        if (value) {
+          value = common.scopedExpression(data, child.pos, value)
+          if (key.indexOf('data-') === 0) {
+            value = he.escape(JSON.stringify(value))
+          }
         }
         return [key, '=', value].join('')
       })

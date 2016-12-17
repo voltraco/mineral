@@ -4,21 +4,20 @@ function parseAttributes (str) {
   const lexer = Lexer(str)
   const args = {}
 
-  while (lexer.length()) {
+  while (true) {
     lexer.match.whitespace()
-    const word = lexer.match.word()
-    if (!word) return args
-    lexer.match.whitespace()
-
+    const name = lexer.match.word()
     const delimiter = lexer.match.delimiter()
-
     let value = true
-    if (delimiter) {
-      lexer.match.whitespace()
-      value = lexer.match.value().trim()
-    }
 
-    args[word.trim()] = value
+    if (delimiter) value = lexer.match.value()
+    if (!name) break
+
+    lexer.match.whitespace()
+    const separator = lexer.match.separator()
+    args[name] = value
+    //console.log('[%s] [%s] [%s] [%s]', name, delimiter, value, lexer.data())
+    if (!lexer.length()) break
   }
   return args
 }

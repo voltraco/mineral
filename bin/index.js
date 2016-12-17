@@ -5,11 +5,13 @@ const mkdirp = require('mkdirp')
 const chokidar = require('chokidar')
 const chalk = require('chalk')
 
-const compiler = require('../compilers/html')
+const compile = require('../compilers/html')
 const parse = require('../parser')
 const readdirSync = require('./readdirsync')
 
 const argv = minimist(process.argv.slice(2))
+
+// TODO: get a pre-cache all mixins
 
 if (argv.h) {
   console.log(`
@@ -52,51 +54,55 @@ const log = (symbol, event, s, ...args) => {
   console.log(msg.join(' '), ...args)
 }
 
-// TODO: get a pre-cache all mixins
+function trunc (s) {
+  const parts = s.split('/')
+  if (parts.length > 3) return s.replace(process.cwd(), '').slice(1)
+  return s
+}
 
-function compile (file) {
+function compileFile (file) {
 
-  const original = file
   if (deps[file]) file = deps[file]
 
-  file = path.resolve(file)
-  const location = path.dirname(file)
-  const source = fs.readFileSync(file, 'utf8')
-  const tree = parse(source)
-  const html = compiler(tree, data, file)
+  const sourcefile = path.resolve(file)
+  const source = fs.readFileSync(sourcefile, 'utf8')
+  const html = compile(parse(source), data, sourcefile)
 
   if (!argv.o) {
-    process.stdout.write(html + '\n')
-  } else {
-    const out = path.join(
-      path.resolve(location),
-      path.relative(location, argv.o)
-    )
-    mkdirp.sync(out)
-    try {
-      file = file.replace(/\.min$/, '.html')
-      const dest = path.join(out, path.basename(file))
-      fs.writeFileSync(dest, html)
-      log(' ✓ ', 'compiled', original)
-    } catch (ex) {
-      console.error(ex)
-      process.exit(1)
-    }
+    return process.stdout.write(html + '\n')
+  }
+
+  const outdir = path.dirname(sourcefile)
+
+  const out = path.join(
+    path.resolve(outdir),
+    path.relative(outdir, argv.o)
+  )
+
+  mkdirp.sync(out)
+
+  try {
+    const destfile = sourcefile.replace(/\.min$/, '.html')
+    const target = path.join(out, path.basename(destfile))
+    fs.writeFileSync(target, html)
+    log(' ✓ ', 'compiled', trunc(file))
+  } catch (ex) {
+    console.error(ex)
+    process.exit(1)
   }
 }
-const files = argv._
 
-files.map(compile)
+argv._.map(compileFile)
 
 if (argv.w) {
 
   global.watcher = chokidar
-    .watch(files, { persistent: true, atomic: true })
-    .on('add', path => compile(path))
-    .on('change', path => compile(path))
-    .on('unlink', path => compile(path))
-    .on('addDir', path => compile(path))
-    .on('unlinkDir', path => compile(path))
+    .watch(argv._, { persistent: true, atomic: true })
+    .on('add', path => compileFile(path))
+    .on('change', path => compileFile(path))
+    .on('unlink', path => compileFile(path))
+    .on('addDir', path => compileFile(path))
+    .on('unlinkDir', path => compileFile(path))
 
   global.addToWatcher = (origin, p) => {
     const target = path.resolve(path.dirname(origin), p)
@@ -104,14 +110,14 @@ if (argv.w) {
 
     deps[target] = origin
     watcher.add(target)
-    log(' · ', 'watching', '%s -> %s', origin, target)
+    log(' · ', 'watching', '%s -> %s', trunc(origin), trunc(target))
   }
 
   function onReady() {
     const watched = watcher.getWatched()
     Object.keys(watched).map(p => watched[p].map(f => {
       const target = path.join(p, f)
-      log(' · ', 'watching', target)
+      log(' · ', 'watching', trunc(target))
     }))
   }
 

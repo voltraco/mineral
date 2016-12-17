@@ -1,6 +1,8 @@
 const QUOTED_RE = /^"|'/
-const WORD_RE = /^[^\n\r =]+/
-const DELIMITER_RE = /^=/
+const WORD_RE = /^[^,\n\r =]+/
+const DELIMITER_RE = /^\s*=\s*/
+const SEP_RE = /^,/
+const EOV_RE = /^\s+[$_A-Za-z]+/ // possible end of value
 const WHITESPACE_RE = /^[^\S\x0a\x0d]*/ // but not new lines
 const ANYSPACE_RE = /^\s*/ // any whitespace
 const NON_WHITESPACE_RE = /^\S+/ // any non whitespace
@@ -170,25 +172,43 @@ module.exports = function Lexer (str, options) {
     let value = ''
     let openSingle = false
     let openDouble = false
+    let openBrace = false
+    let openBracket = false
+    let openParen = false
 
     while (true) {
       if (lexer.length() === 0) {
         lexer.error('Unexpected end of source')
       }
 
+      let next = lexer.peek(0, 2)
       let ch = lexer.pop()
 
-      if (ch === '\\') continue
       if (ch === '\'') openSingle = !openSingle
-      if (ch === '"') openDouble = !openDouble
+      else if (ch === '"') openDouble = !openDouble
+      else if (ch === '{') openBrace = true
+      else if (ch === '}') openBrace = false
+      else if (ch === '[') openBracket = true
+      else if (ch === ']') openBracket = false
+      else if (ch === '(') openParen = true
+      else if (ch === ')') openParen = false
 
+      let closed = !openSingle && !openDouble && 
+        !openBracket && !openBrace && !openParen
+
+      if (closed && /[\r\n,]/.test(ch)) break
+
+      // ticky bit -- if closed, after one or more whitespace, we don't
+      // find an operator, we can asume that this is not an expression, it
+      // must be the end of the value.
+      if (closed && EOV_RE.test(next)) {
+        //value += ch
+        break
+      }
       value += ch
 
-      if (!openSingle && !openDouble &&
-        (/ |,/.test(ch) || !lexer.length())) break
+      if (!lexer.length()) break
     }
-
-    if (value === '') lexer.error('Expected value')
     return value
   }
 
@@ -199,6 +219,11 @@ module.exports = function Lexer (str, options) {
 
   pm.delimiter = function delimiter () {
     const m = matcher(DELIMITER_RE)
+    return m && m[0]
+  }
+
+  pm.separator = function separator () {
+    const m = matcher(SEP_RE)
     return m && m[0]
   }
 
