@@ -1,8 +1,6 @@
+section#tags
 
-
-section(id="tags")
-
-  .pre
+  a(href="#tags")
     h2 tags
 
   p lowercase text at the start of a line (or after only white space) is

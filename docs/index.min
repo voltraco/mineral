@@ -18,6 +18,16 @@ body
         a(href="#mixins") mixins
       li
         a(href="#conditionals") conditionals
+      li
+        a(href="#iteration") iteration
+      li
+        a(href="#values") values
+      li
+        a(href="#text") text
+      li
+        a(href="#filters") filters
+      li
+        a(href="#comments") comments
 
   p mineral is a language that compiles to markup. It's similar to Jade (aka 
     a(href="https://pugjs.org") pug

@@ -54,7 +54,6 @@ module.exports = function Parser (source) {
     const tagOrSymbol = lexer.match.tagOrSymbol()
 
     if (tagOrSymbol) {
-
       const attributes = (!contentTarget &&
         parseAttributes(lexer.match.parens()))
 

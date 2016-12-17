@@ -1,40 +1,41 @@
-a(id="text" href="#text")
-  h2 text
+section#text
+  a(id="text" href="#text")
+    h2 text
 
-p To continue the text content of a tag, you can use the `|` symbol.
+  p To continue the text content of a tag, you can use the `|` symbol.
 
-pre.input
-  code.
-    p Danzig is an American heavy metal band, formed in 1987 in Lodi,
-    | New Jersey, United States. The band is the musical outlet for singer
-    | and songwriter Glenn Danzig, preceded by the horror punk bands the
-    | Misfits and Samhain. They play in a bluesy doom-driven heavy metal
-    | style influenced by the early sound of Black Sabbath.[1]
+  pre.input
+    code.
+      p Danzig is an American heavy metal band, formed in 1987 in Lodi,
+      | New Jersey, United States. The band is the musical outlet for singer
+      | and songwriter Glenn Danzig, preceded by the horror punk bands the
+      | Misfits and Samhain. They play in a bluesy doom-driven heavy metal
+      | style influenced by the early sound of Black Sabbath.[1]
 
-p Multiline textblocks, adding a `.` after the tag will indicate to the
-  | compiler that all whitespace should be preserved and that text should
-  | not be evaluated.
+  p Multiline textblocks, adding a `.` after the tag will indicate to the
+    | compiler that all whitespace should be preserved and that text should
+    | not be evaluated.
 
-pre.input
-  code.
-    .foo.
-      Hello
-      world.
+  pre.input
+    code.
+      .foo.
+        Hello
+        world.
 
-pre.output
-  code.
-    <div class="foo">
-      Hello
-      world.
-    </div>
+  pre.output
+    code.
+      <div class="foo">
+        Hello
+        world.
+      </div>
 
-p This feature is relevant when adding javascript to a script tag.
+  p This feature is relevant when adding javascript to a script tag.
 
-pre.input
-  code.
-    script.
-      var s = 'hello, world'
-      alert(s)
-    h1 I sent you an alert.
+  pre.input
+    code.
+      script.
+        var s = 'hello, world'
+        alert(s)
+      h1 I sent you an alert.
 
 

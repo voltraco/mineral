@@ -1,31 +1,33 @@
-a(id="comments" href="#comments")
-  h2 comments
+section#comments
 
-p Single-line
+  a(href="#comments")
+    h2 comments
 
-pre.input
-  code.
-    // single line
+  p Single-line
 
-p Multi-line (`.beep` and `.boop` are commented)
+  pre.input
+    code.
+      // single line
 
-pre.input
-  code.
-    .foo1
-    //
-      .beep
-        .boop
-    .foo2
+  p Multi-line (`.beep` and `.boop` are commented)
 
-p
-  span.red note
-  | comments have no business in compiled code, so unlike jade/pug they are
-  | completely removed. Conditional comments are no longer supported by any IE
-  | version. If for some reason you really want comments, you can use the
-  | comment tag.
-pre.input
-  code.
-    comment Hey good lookin'
-pre.output
-  code.
-    <!-- Hey good lookin' -->
+  pre.input
+    code.
+      .foo1
+      //
+        .beep
+          .boop
+      .foo2
+
+  p
+    span.red note
+    | comments have no business in compiled code, so unlike jade/pug they are
+    | completely removed. Conditional comments are no longer supported by any IE
+    | version. If for some reason you really want comments, you can use the
+    | comment tag.
+  pre.input
+    code.
+      comment Hey good lookin'
+  pre.output
+    code.
+      <!-- Hey good lookin' -->

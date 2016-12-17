@@ -1,13 +1,15 @@
-a(id="filters" href="#filters")
-  h2 filters
+section#filters
 
-p Use any 
-  a(href="https://www.npmjs.com/browse/keyword/jstransformer") jstramsformer
-  | module. For example, `npm install --save jstransformer-marked`. Arguments
-  | and parens are optional.
+  a(href="#filters")
+    h2 filters
 
-pre.input
-  code.
-    :marked(gfm=true) ./readme.md
+  p Use any 
+    a(href="https://www.npmjs.com/browse/keyword/jstransformer") jstramsformer
+    | module. For example, `npm install --save jstransformer-marked`. Arguments
+    | and parens are optional.
+
+  pre.input
+    code.
+      :marked(gfm=true) ./readme.md
 
 

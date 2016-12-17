@@ -38,9 +38,6 @@ a {
 p {
   line-height: 23px;
 }
-p:first-of-type {
-  margin: 100px 0 50px 0;
-}
 pre,
 code {
   font-family: 'Source Code Pro', monospace;
@@ -86,7 +83,7 @@ nav a:hover,
 nav a:visited:hover {
   color: #ff5252;
 }
-</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><ul><li><a href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li></ul></nav><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative to pug. a significantly smaller codebase, a slimmer set of features and the ability to output dom elements as well as html.<section id="tags"><div class="pre"></div><h2>tags</h2><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
+</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><ul><li><a href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative to pug. a significantly smaller codebase, a slimmer set of features and the ability to output dom elements as well as html.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
@@ -100,18 +97,18 @@ body
 &lt;/body&gt;
 </code></pre><p><span class="red">note</span> it's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
 </code></pre><p><span class="red">note</span> mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
-</code></pre></section><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
+</code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
   h1= firstName
   h2= lastName
 </code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
-</code></pre></p><a id="conditionals" href="#conditionals"><h2>conditionals</h2></a><p>conditional statements (`if`, `else if` and `else`) have no parenthesis. they will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
+</code></pre></p></section><section id="conditionals"><a href="#conditionals"><h2>conditionals</h2></a><p>conditional statements (`if`, `else if` and `else`) have no parenthesis. they will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
   p this statement is false
 else if 100 &gt; 99
   p this statement is also false, and optional
 else
   p this is the final branch of this logic
 
-</code></pre></p><a id="iteration" href="#iteration"><h2>iteration</h2></a><p>iterate over objects or arrays using `for` (there is no `each` like jade/pug). `for` will iterate over and object or array. In this example, `p` is the object key, if the value was an array, it would be the current index.</p><pre class="input"><code>{
+</code></pre></p></section><section id="iteration"><a href="#iteration"><h2>iteration</h2></a><p>iterate over objects or arrays using `for` (there is no `each` like jade/pug). `for` will iterate over and object or array. In this example, `p` is the object key, if the value was an array, it would be the current index.</p><pre class="input"><code>{
   people: [
     { first: &#x27;Tom&#x27;, last: &#x27;Waits&#x27; },
     { first: &#x27;Dick&#x27;, last: &#x27;Dale&#x27; }
@@ -124,9 +121,9 @@ else
 </code></pre><p>while loops evaluate a javascript expression until it becomes falsey.</p><pre class="input"><code>ul
   while x--
     li= x
-</code></pre><a id="values" href="#values"><h2>dynamic values</h2></a><p>Using the `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any other valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
+</code></pre></section><section id="values"><a id="values" href="#values"><h2>dynamic values</h2></a><p>Using the `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any other valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
 </code></pre><p>Automatically detects `console.log`-like values.</p><pre class="input"><code>h1 = &#x27;Hello %s&#x27;, foo
-</code></pre><a id="text" href="#text"><h2>text</h2></a><p>To continue the text content of a tag, you can use the `|` symbol.</p><pre class="input"><code>p Danzig is an American heavy metal band, formed in 1987 in Lodi,
+</code></pre></section><section id="text"><a id="text" href="#text"><h2>text</h2></a><p>To continue the text content of a tag, you can use the `|` symbol.</p><pre class="input"><code>p Danzig is an American heavy metal band, formed in 1987 in Lodi,
 | New Jersey, United States. The band is the musical outlet for singer
 | and songwriter Glenn Danzig, preceded by the horror punk bands the
 | Misfits and Samhain. They play in a bluesy doom-driven heavy metal
@@ -144,14 +141,14 @@ else
 h1 I sent you an alert.
 
 
-</code></pre><a id="filters" href="#filters"><h2>filters</h2></a><p>Use any <a href="https://www.npmjs.com/browse/keyword/jstransformer">jstramsformer</a> module. For example, `npm install --save jstransformer-marked`. Arguments and parens are optional.</p><pre class="input"><code>:marked(gfm=true) ./readme.md
+</code></pre></section><section id="filters"><a href="#filters"><h2>filters</h2></a><p>Use any <a href="https://www.npmjs.com/browse/keyword/jstransformer">jstramsformer</a> module. For example, `npm install --save jstransformer-marked`. Arguments and parens are optional.</p><pre class="input"><code>:marked(gfm=true) ./readme.md
 
 
-</code></pre><a id="comments" href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>
+</code></pre></section><section id="comments"><a href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>
 </code></pre><p>Multi-line (`.beep` and `.boop` are commented)</p><pre class="input"><code>.foo1
 
   .beep
     .boop
 .foo2
 </code></pre><p><span class="red">note</span> comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
-</code></pre></p>
+</code></pre></section></p>

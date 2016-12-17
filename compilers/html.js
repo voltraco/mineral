@@ -199,6 +199,10 @@ function html (tree, data, location, cb) {
 
     let tag = ['<', props.tagname]
 
+    if (props.id) {
+      tag.push(' id="', props.id, '"')
+    }
+
     if (props.classname) {
       tag.push(' class="', props.classname, '"')
     }

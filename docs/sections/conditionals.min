@@ -1,15 +1,17 @@
-a(id="conditionals", href="#conditionals")
-  h2 conditionals
+section#conditionals
 
-p conditional statements (`if`, `else if` and `else`) have no parenthesis.
-  | they will evaluate a javascript expression to determine truthyness.
+  a(href="#conditionals")
+    h2 conditionals
 
-  pre.input
-    code.
-      if 1 === 'x'
-        p this statement is false
-      else if 100 > 99
-        p this statement is also false, and optional
-      else
-        p this is the final branch of this logic
+  p conditional statements (`if`, `else if` and `else`) have no parenthesis.
+    | they will evaluate a javascript expression to determine truthyness.
+
+    pre.input
+      code.
+        if 1 === 'x'
+          p this statement is false
+        else if 100 > 99
+          p this statement is also false, and optional
+        else
+          p this is the final branch of this logic
 
