@@ -3,8 +3,8 @@ section#conditionals
   a(href="#conditionals")
     h2 conditionals
 
-  p conditional statements (`if`, `else if` and `else`) have no parenthesis.
-    | they will evaluate a javascript expression to determine truthyness.
+  p Conditional statements (`if`, `else if` and `else`) have no parenthesis.
+    | They will evaluate a javascript expression to determine truthyness.
 
     pre.input
       code.

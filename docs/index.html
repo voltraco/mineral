@@ -13,10 +13,12 @@ h4 {
   font-family: 'Source Sans Pro', sans-serif;
 }
 h1 {
-  font-size: 2.5em;
+  font-size: 2em;
   vertical-align: bottom;
   margin-left: 20px;
   display: inline;
+  text-transform: uppercase;
+  line-height: 1.6em;
 }
 h2 {
   border: 2px solid #ff5252;
@@ -56,6 +58,20 @@ pre {
 pre.warn {
   border-bottom: 1px solid #f00;
 }
+.hamburger {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 30px;
+  height: 24px;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  z-index: 20;
+}
+.hamburger .inner {
+  height: 12px;
+  border-bottom: 1px solid #333;
+}
 nav {
   opacity: 0;
   z-index: 10;
@@ -71,8 +87,9 @@ nav {
 nav em {
   font-style: normal;
   display: inline-block;
-  margin: 14px 20px;
+  margin: 16px 20px;
   font-size: 21px;
+  text-transform: uppercase;
   font-family: 'Source Sans Pro', sans-serif;
 }
 nav ul {
@@ -112,7 +129,7 @@ nav a:visited.active {
     display: none;
   }
 }
-</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p><a href="https://github.com/voltraco/mineral">mineral</a> is a language that compiles to markup or dom. it's similar to Jade (aka Pug). its goal is to be a light-weight alternative to pug with a significantly smaller codebase, a slimmer set of features and the ability to integrate well with modern client side frameworks.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
+</style><title>Foo</title><meta name="description" content="A terse language that compiles to html and dom trees"><meta name="keywords" content="templates, templating, javascript, js, jade, jade-lang, pug, pugjs, pug-js, mineraljs, mineral-lang, mineral-js"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><link rel="icon" type="image/png" href="https://voltra.co/favicon-32x32.png" sizes="32x32"><link rel="icon" type="image/png" href="https://voltra.co/favicon-16x16.png" sizes="16x16"></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><div class="hamburger"><div class="inner"></div></div><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p><a href="https://github.com/voltraco/mineral">Mineral</a> is a language that compiles to markup or dom trees. It's similar to Jade (aka Pug). Its goal is to be a light-weight alternative to pug with a significantly smaller codebase, a slimmer set of features and the ability to integrate well with modern client side frameworks.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>Lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. Tag attributes look similar to html (with optional comma), but their values are regular javascript.</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
@@ -125,28 +142,28 @@ body
     &lt;h1&gt;Hello World&lt;/h1&gt;
   &lt;/body&gt;
 &lt;/html&gt;
-</code></pre><p><span class="red">note</span> it's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
-</code></pre><p><span class="red">note</span> mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
-</code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
+</code></pre><p><span class="red">note</span> It's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
+</code></pre><p><span class="red">note</span> Mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
+</code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>All html is lowercase, anything starting with an uppercase letter is a mixin. arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
   h1= firstName
   h2= lastName
 </code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
-</code></pre></p></section><section id="conditionals"><a href="#conditionals"><h2>conditionals</h2></a><p>conditional statements (`if`, `else if` and `else`) have no parenthesis. they will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
+</code></pre></p></section><section id="conditionals"><a href="#conditionals"><h2>conditionals</h2></a><p>Conditional statements (`if`, `else if` and `else`) have no parenthesis. They will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
   p this statement is false
 else if 100 &gt; 99
   p this statement is also false, and optional
 else
   p this is the final branch of this logic
 
-</code></pre></p></section><section id="iteration"><a href="#iteration"><h2>iteration</h2></a><p>iterate over objects or arrays using `for` (there is no `each` like jade/pug). `for` will iterate over and object or array. In this example, `p` is the object key, if the value was an array, it would be the current index.</p><pre class="input"><code>{
+</code></pre></p></section><section id="iteration"><a href="#iteration"><h2>iteration</h2></a><p>Iterate over objects or arrays using `for` (there is no `each` like jade/pug) or using `while`.</p><pre class="input"><code>{
   people: [
     { first: &#x27;Tom&#x27;, last: &#x27;Waits&#x27; },
     { first: &#x27;Dick&#x27;, last: &#x27;Dale&#x27; }
   ]
 }
-</code></pre><p>a for loop will iterate over an object or an array-like object.</p><pre class="input"><code>for key, val in people
+</code></pre><p>A for loop will iterate over an object or an array-like object.</p><pre class="input"><code>for key, val in people
   +Foo(val.first, val.last)
-</code></pre><p>the value variable is optional, as illustrated here.</p><pre class="input"><code>for p in people
+</code></pre><p>The value variable is optional, as illustrated here.</p><pre class="input"><code>for p in people
   +Foo(people[p].first, people[p].last)
 </code></pre><p>while loops evaluate a javascript expression until it becomes falsey.</p><pre class="input"><code>ul
   while x--
@@ -178,5 +195,5 @@ h1 I sent you an alert.
   .beep
     .boop
 .foo2
-</code></pre><p><span class="red">note</span> comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version, so they need to die. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
+</code></pre><p><span class="red">note</span> Comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version, so they need to die. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
 </code></pre></section></p><script src="./index.js"></script>

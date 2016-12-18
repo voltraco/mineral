@@ -3,11 +3,11 @@ section#tags
   a(href="#tags")
     h2 tags
 
-  p lowercase text at the start of a line (or after only white space) is
+  p Lowercase text at the start of a line (or after only white space) is
     | considered an html tag. Indenting a tag will nest it, creating the
-    | tree-like structure that can be rendered into html. tag attributes
+    | tree-like structure that can be rendered into html. Tag attributes
     | look similar to html (with optional comma), but their values are regular
-    | JavaScript.
+    | javascript.
 
   pre.input
     code.
@@ -31,7 +31,7 @@ section#tags
 
   p
     span.red note
-    | it's ideal to disambiguate expressions or declarations when using them as
+    | It's ideal to disambiguate expressions or declarations when using them as
     | attribute values.
   pre.warn
     code.
@@ -39,7 +39,7 @@ section#tags
 
   p
     span.red note
-    | mineral does not support the (rather superfluous) class-after-attribute
+    | Mineral does not support the (rather superfluous) class-after-attribute
     | syntax.
   pre.warn
     code.

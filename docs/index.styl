@@ -14,10 +14,12 @@ h1, h2, h3, h4
   font-family 'Source Sans Pro', sans-serif
 
 h1
-  font-size 2.5em
+  font-size 2em
   vertical-align bottom
   margin-left 20px
   display inline
+  text-transform uppercase
+  line-height 1.6em
 
 h2
   border 2px solid $red
@@ -53,6 +55,21 @@ pre
   &.warn
     border-bottom 1px solid red
 
+.hamburger
+  opacity 1
+  transition all .4s
+  position absolute
+  top 20px
+  right 20px
+  width 30px
+  height 24px
+  border-top 1px solid $gray
+  border-bottom 1px solid $gray
+  z-index 20
+  .inner
+    height 12px
+    border-bottom 1px solid $gray
+
 nav
   opacity 0
   z-index 10
@@ -68,8 +85,9 @@ nav
   em
     font-style normal
     display inline-block
-    margin 14px 20px
+    margin 16px 20px
     font-size 21px
+    text-transform uppercase
     font-family 'Source Sans Pro', sans-serif
 
   ul
@@ -81,7 +99,7 @@ nav
       float left
 
   a, a:visited
-    transition all .4s ease
+    transition all .4s
     color $gray
     font-size 12px
     text-transform uppercase

@@ -21,7 +21,7 @@ section#comments
 
   p
     span.red note
-    | comments have no business in compiled code, so unlike jade/pug they are
+    | Comments have no business in compiled code, so unlike jade/pug they are
     | completely removed. Conditional comments are no longer supported by any IE
     | version, so they need to die. If for some reason you really want comments,
     | you can use the comment tag.

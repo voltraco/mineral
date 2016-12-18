@@ -69,17 +69,32 @@ links.map(function (link) {
 })
 
 var nav = document.querySelector('nav')
+var hamburger = document.querySelector('.hamburger')
+var showAfterClick = false
+
+hamburger.addEventListener('click', function () {
+  nav.style.opacity = 1
+  hamburger.style.zIndex = -1
+  hamburger.style.opacity = 0
+  showAfterClick = true
+})
 
 function onscroll (event) {
   if (scrolling) return
 
   var pos = document.body.scrollTop
 
-  if (pos <= 90 && pos >= 0) {
+  if (pos <= 90 && pos >= 0 && !showAfterClick) {
     nav.style.opacity = (pos / 100)
   }
 
+  if (pos <= 0) {
+    hamburger.style.zIndex = 20
+    hamburger.style.opacity = 1
+  }
+
   if (pos > 100) {
+    showAfterClick = false
     nav.style.opacity = .9
   }
 

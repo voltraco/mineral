@@ -1,49 +1,47 @@
 html
-head
-  link(
-    href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Code+Pro|Source+Sans+Pro"
-    rel="stylesheet"
-  )
-  style
-    :stylus ./index.styl
-body
-  header
-    img(width="50px" height="50px" src="./logo.svg")
-    h1 mineral
-  nav
-    em mineral
-    ul
-      li
-        a.active(href="#tags") tags
-      li
-        a(href="#mixins") mixins
-      li
-        a(href="#conditionals") conditionals
-      li
-        a(href="#iteration") iteration
-      li
-        a(href="#values") values
-      li
-        a(href="#text") text
-      li
-        a(href="#filters") filters
-      li
-        a(href="#comments") comments
 
-  p
-    a(href="https://github.com/voltraco/mineral") mineral
-    | is a language that compiles to markup or dom. it's similar to Jade (aka
-    | Pug). its goal is to be a light-weight alternative to pug with a
-    | significantly smaller codebase, a slimmer set of features and the
-    | ability to integrate well with modern client side frameworks.
+  include ./header.min
 
-    include ./sections/tags.min
-    include ./sections/mixins.min
-    include ./sections/conditionals.min
-    include ./sections/iteration.min
-    include ./sections/values.min
-    include ./sections/text.min
-    include ./sections/filters.min
-    include ./sections/comments.min
+  body
+    header
+      img(width="50px" height="50px" src="./logo.svg")
+      h1 mineral
+    .hamburger
+      .inner
+    nav
+      em mineral
+      ul
+        li
+          a.active(href="#tags") tags
+        li
+          a(href="#mixins") mixins
+        li
+          a(href="#conditionals") conditionals
+        li
+          a(href="#iteration") iteration
+        li
+          a(href="#values") values
+        li
+          a(href="#text") text
+        li
+          a(href="#filters") filters
+        li
+          a(href="#comments") comments
 
-  script(src="./index.js")
+    p
+      a(href="https://github.com/voltraco/mineral") Mineral
+      | is a language that compiles to markup or dom trees. It's similar to
+      | Jade (aka Pug). Its goal is to be a light-weight alternative to pug
+      | with a significantly smaller codebase, a slimmer set of features and
+      | the ability to integrate well with modern client side frameworks.
+
+      include ./sections/tags.min
+      include ./sections/mixins.min
+      include ./sections/conditionals.min
+      include ./sections/iteration.min
+      include ./sections/values.min
+      include ./sections/text.min
+      include ./sections/filters.min
+      include ./sections/comments.min
+
+    script(src="./index.js")

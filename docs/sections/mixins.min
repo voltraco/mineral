@@ -2,8 +2,8 @@ section#mixins
   a(id="mixins" href="#mixins")
     h2 mixins
 
-  p all html is lowercase, anything starting with an uppercase letter is a
-    | mixin. Arguments and parens are optional. mixins are global (less fiddling 
+  p All html is lowercase, anything starting with an uppercase letter is a
+    | mixin. arguments and parens are optional. mixins are global (less fiddling 
     | with paths).
 
     pre.input

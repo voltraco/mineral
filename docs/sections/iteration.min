@@ -2,10 +2,8 @@ section#iteration
   a(href="#iteration")
     h2 iteration
 
-  p iterate over objects or arrays using `for` (there is no `each` like
-    | jade/pug). `for` will iterate over and object or array. In this
-    | example, `p` is the object key, if the value was an array, it would be
-    | the current index.
+  p Iterate over objects or arrays using `for` (there is no `each` like
+    | jade/pug) or using `while`.
 
   pre.input
     code.
@@ -16,13 +14,13 @@ section#iteration
         ]
       }
 
-  p a for loop will iterate over an object or an array-like object.
+  p A for loop will iterate over an object or an array-like object.
   pre.input
     code.
       for key, val in people
         +Foo(val.first, val.last)
 
-  p the value variable is optional, as illustrated here.
+  p The value variable is optional, as illustrated here.
   pre.input
     code.
       for p in people
