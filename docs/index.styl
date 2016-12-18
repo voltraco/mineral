@@ -7,6 +7,9 @@ body
   font-size 1em
   padding 20%
 
+section
+  padding-top 50px
+
 h1, h2, h3, h4
   font-family 'Source Sans Pro', sans-serif
 
@@ -51,6 +54,7 @@ pre
     border-bottom 1px solid red
 
 nav
+  opacity 0
   z-index 10
   position fixed
   top 0
@@ -61,17 +65,40 @@ nav
   border-bottom 1px solid $lightgray
   box-shadow 0px 2px 3px $lightgray
 
+  em
+    font-style normal
+    display inline-block
+    margin 14px 20px
+    font-size 21px
+    font-family 'Source Sans Pro', sans-serif
+
   ul
+    display inline-block
+    float right
     margin-right 10px
     list-style none
     li
-      float right
+      float left
 
   a, a:visited
+    transition all .4s ease
     color $gray
     font-size 12px
     text-transform uppercase
     margin 14px
     text-decoration none
-    &:hover
+    border 1px solid transparent
+    letter-spacing .03em
+    padding 4px
+
+    &:hover, &.active
       color $red
+
+    &.active
+      border 1px solid
+      padding 4px
+
+@media screen and (max-width: 900px)
+  nav
+    display none
+
