@@ -3,15 +3,15 @@ section#values
   a(id="values" href="#values")
     h2 dynamic values
 
-  p Using the `=` symbol indicates that the value should be an expression. An
+  p The `=` symbol indicates that the value should be an expression. An
     | expression can include values from the data passed to the template or
-    | any other valid javascript.
+    | any valid javascript.
 
   pre.input
     code.
       h1 = 'Hello, ' + name
 
-  p Automatically detects `console.log`-like values.
+  p Mineral detects `console.log`-like statements.
   pre.input
     code.
       h1 = 'Hello %s', foo

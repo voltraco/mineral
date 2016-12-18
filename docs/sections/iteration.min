@@ -2,25 +2,28 @@ section#iteration
   a(href="#iteration")
     h2 iteration
 
-  p Iterate over objects or arrays using `for` (there is no `each` like
-    | jade/pug) or using `while`.
+  p Iterate over objects or arrays using `for` or `while`. Mineral does not
+    | implelent the `each` statement. Here are some examples using the
+    | following JSON data.
 
   pre.input
     code.
       {
+        count: 2,
         people: [
           { first: 'Tom', last: 'Waits' },
           { first: 'Dick', last: 'Dale' }
         ]
       }
 
-  p A for loop will iterate over an object or an array-like object.
+  p A for loop provides the key (or index) and optionally the value for each
+    | item in an array or object.
   pre.input
     code.
       for key, val in people
         +Foo(val.first, val.last)
 
-  p The value variable is optional, as illustrated here.
+  p The value variable is optional.
   pre.input
     code.
       for p in people
@@ -30,5 +33,5 @@ section#iteration
   pre.input
     code.
       ul
-        while x--
-          li= x
+        while count--
+          span.name= people[count].first

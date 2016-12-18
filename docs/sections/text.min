@@ -12,9 +12,8 @@ section#text
       | Misfits and Samhain. They play in a bluesy doom-driven heavy metal
       | style influenced by the early sound of Black Sabbath.[1]
 
-  p Multiline textblocks, adding a `.` after the tag will indicate to the
-    | compiler that all whitespace should be preserved and that text should
-    | not be evaluated.
+  p For multiline textblocks, add a `.` after the tag. The compiler wont
+    | evaluate any code inside these blocks. It will also preserve whitespace.
 
   pre.input
     code.
@@ -29,7 +28,7 @@ section#text
         world.
       </div>
 
-  p This feature is relevant when adding javascript to a script tag.
+  p This feature is pretty important when adding javascript to a script tag.
 
   pre.input
     code.
@@ -37,5 +36,3 @@ section#text
         var s = 'hello, world'
         alert(s)
       h1 I sent you an alert.
-
-

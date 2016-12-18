@@ -231,14 +231,14 @@ module.exports = function Lexer (str, options) {
     return m && m[0]
   }
 
-  pm.content = function content () {
+  pm.content = function content (preserveComments) {
     let value = ''
     let lastch = ''
 
     while(true) {
       let ch = lexer.peek(0, 1)
 
-      if (ch === '/') {
+      if (ch === '/' && !preserveComments) {
         const nextch = lexer.peek(1, 2)
         if (lastch !== ':' && nextch === '/') {
           value = value.trim() // its a line comment, not a url

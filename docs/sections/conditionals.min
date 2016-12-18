@@ -5,6 +5,7 @@ section#conditionals
 
   p Conditional statements (`if`, `else if` and `else`) have no parenthesis.
     | They will evaluate a javascript expression to determine truthyness.
+    | Mineral does not implement `case` or `unless` statements.
 
     pre.input
       code.

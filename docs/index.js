@@ -71,6 +71,7 @@ links.map(function (link) {
 var nav = document.querySelector('nav')
 var hamburger = document.querySelector('.hamburger')
 var showAfterClick = false
+var lastpos
 
 hamburger.addEventListener('click', function () {
   nav.style.opacity = 1
@@ -93,11 +94,16 @@ function onscroll (event) {
     hamburger.style.opacity = 1
   }
 
+  if (pos < lastpos) {
+    showAfterClick = false
+  }
+
   if (pos > 100) {
     showAfterClick = false
     nav.style.opacity = .9
   }
 
+  lastpos = pos
   pos = pos + 100
 
   ranges.map(function (range) {

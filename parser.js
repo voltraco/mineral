@@ -36,7 +36,6 @@ module.exports = function Parser (source) {
 
   while (lexer.length()) {
     const whitespace = lexer.match.whitespace()
-    lexer.match.comment()
 
     if (contentTarget) {
       if (whitespace.length <= contentTargetIndent) {
@@ -45,12 +44,13 @@ module.exports = function Parser (source) {
       } else {
         // add newlines and whitespace, but trim to the current indent.
         const trimmed = whitespace.slice(contentTargetIndent + 2)
-        contentTarget.content += trimmed + lexer.match.content()
+        contentTarget.content += trimmed + lexer.match.content(true)
         contentTarget.content += (lexer.match.newline() || '')
         continue
       }
     }
 
+    lexer.match.comment()
     const tagOrSymbol = lexer.match.tagOrSymbol()
 
     if (tagOrSymbol) {

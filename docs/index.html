@@ -4,7 +4,7 @@
   padding: 20%;
 }
 section {
-  padding-top: 50px;
+  padding-top: 30px;
 }
 h1,
 h2,
@@ -15,7 +15,6 @@ h4 {
 h1 {
   font-size: 2em;
   vertical-align: bottom;
-  margin-left: 20px;
   display: inline;
   text-transform: uppercase;
   line-height: 1.6em;
@@ -59,6 +58,8 @@ pre.warn {
   border-bottom: 1px solid #f00;
 }
 .hamburger {
+  opacity: 1;
+  transition: all 0.4s;
   position: absolute;
   top: 20px;
   right: 20px;
@@ -103,7 +104,7 @@ nav ul li {
 }
 nav a,
 nav a:visited {
-  transition: all 0.4s ease;
+  transition: all 0.4s;
   color: #333;
   font-size: 12px;
   text-transform: uppercase;
@@ -125,11 +126,12 @@ nav a:visited.active {
   padding: 4px;
 }
 @media screen and (max-width: 900px) {
-  nav {
+  nav,
+  .hamburger {
     display: none;
   }
 }
-</style><title>Foo</title><meta name="description" content="A terse language that compiles to html and dom trees"><meta name="keywords" content="templates, templating, javascript, js, jade, jade-lang, pug, pugjs, pug-js, mineraljs, mineral-lang, mineral-js"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><link rel="icon" type="image/png" href="https://voltra.co/favicon-32x32.png" sizes="32x32"><link rel="icon" type="image/png" href="https://voltra.co/favicon-16x16.png" sizes="16x16"></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><div class="hamburger"><div class="inner"></div></div><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p><a href="https://github.com/voltraco/mineral">Mineral</a> is a language that compiles to markup or dom trees. It's similar to Jade (aka Pug). Its goal is to be a light-weight alternative to pug with a significantly smaller codebase, a slimmer set of features and the ability to integrate well with modern client side frameworks.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>Lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. Tag attributes look similar to html (with optional comma), but their values are regular javascript.</p><pre class="input"><code>html
+</style><title>Foo</title><meta name="description" content="A terse language that compiles to html and dom trees"><meta name="keywords" content="templates, templating, javascript, js, jade, jade-lang, pug, pugjs, pug-js, mineraljs, mineral-lang, mineral-js"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><link rel="icon" type="image/png" href="https://voltra.co/favicon-32x32.png" sizes="32x32"><link rel="icon" type="image/png" href="https://voltra.co/favicon-16x16.png" sizes="16x16"></head><body><header><h1>mineral</h1></header><div class="hamburger"><div class="inner"></div></div><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p><a href="https://github.com/voltraco/mineral">Mineral</a> is a tiny language that compiles to markup or dom trees. It's similar to Jade (aka Pug). Its goal is to be a light-weight alternative to pug with a significantly smaller codebase, a slimmer set of features and the ability to integrate well with modern client side frameworks.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>Lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. Tag attributes look similar to html (with optional comma), but their values are regular javascript.</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
@@ -148,52 +150,51 @@ body
   h1= firstName
   h2= lastName
 </code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
-</code></pre></p></section><section id="conditionals"><a href="#conditionals"><h2>conditionals</h2></a><p>Conditional statements (`if`, `else if` and `else`) have no parenthesis. They will evaluate a javascript expression to determine truthyness.<pre class="input"><code>if 1 === &#x27;x&#x27;
+</code></pre></p></section><section id="conditionals"><a href="#conditionals"><h2>conditionals</h2></a><p>Conditional statements (`if`, `else if` and `else`) have no parenthesis. They will evaluate a javascript expression to determine truthyness. Mineral does not implement `case` or `unless` statements.<pre class="input"><code>if 1 === &#x27;x&#x27;
   p this statement is false
 else if 100 &gt; 99
   p this statement is also false, and optional
 else
   p this is the final branch of this logic
 
-</code></pre></p></section><section id="iteration"><a href="#iteration"><h2>iteration</h2></a><p>Iterate over objects or arrays using `for` (there is no `each` like jade/pug) or using `while`.</p><pre class="input"><code>{
+</code></pre></p></section><section id="iteration"><a href="#iteration"><h2>iteration</h2></a><p>Iterate over objects or arrays using `for` or `while`. Mineral does not implelent the `each` statement. Here are some examples using the following JSON data.</p><pre class="input"><code>{
+  count: 2,
   people: [
     { first: &#x27;Tom&#x27;, last: &#x27;Waits&#x27; },
     { first: &#x27;Dick&#x27;, last: &#x27;Dale&#x27; }
   ]
 }
-</code></pre><p>A for loop will iterate over an object or an array-like object.</p><pre class="input"><code>for key, val in people
+</code></pre><p>A for loop provides the key (or index) and optionally the value for each item in an array or object.</p><pre class="input"><code>for key, val in people
   +Foo(val.first, val.last)
-</code></pre><p>The value variable is optional, as illustrated here.</p><pre class="input"><code>for p in people
+</code></pre><p>The value variable is optional.</p><pre class="input"><code>for p in people
   +Foo(people[p].first, people[p].last)
 </code></pre><p>while loops evaluate a javascript expression until it becomes falsey.</p><pre class="input"><code>ul
-  while x--
-    li= x
-</code></pre></section><section id="values"><a id="values" href="#values"><h2>dynamic values</h2></a><p>Using the `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any other valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
-</code></pre><p>Automatically detects `console.log`-like values.</p><pre class="input"><code>h1 = &#x27;Hello %s&#x27;, foo
+  while count--
+    span.name= people[count].first
+</code></pre></section><section id="values"><a id="values" href="#values"><h2>dynamic values</h2></a><p>The `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
+</code></pre><p>Mineral detects `console.log`-like statements.</p><pre class="input"><code>h1 = &#x27;Hello %s&#x27;, foo
 </code></pre></section><section id="text"><a id="text" href="#text"><h2>text</h2></a><p>To continue the text content of a tag, you can use the `|` symbol.</p><pre class="input"><code>p Danzig is an American heavy metal band, formed in 1987 in Lodi,
 | New Jersey, United States. The band is the musical outlet for singer
 | and songwriter Glenn Danzig, preceded by the horror punk bands the
 | Misfits and Samhain. They play in a bluesy doom-driven heavy metal
 | style influenced by the early sound of Black Sabbath.[1]
-</code></pre><p>Multiline textblocks, adding a `.` after the tag will indicate to the compiler that all whitespace should be preserved and that text should not be evaluated.</p><pre class="input"><code>.foo.
+</code></pre><p>For multiline textblocks, add a `.` after the tag. The compiler wont evaluate any code inside these blocks. It will also preserve whitespace.</p><pre class="input"><code>.foo.
   Hello
   world.
 </code></pre><pre class="output"><code>&lt;div class=&quot;foo&quot;&gt;
   Hello
   world.
 &lt;/div&gt;
-</code></pre><p>This feature is relevant when adding javascript to a script tag.</p><pre class="input"><code>script.
+</code></pre><p>This feature is pretty important when adding javascript to a script tag.</p><pre class="input"><code>script.
   var s = &#x27;hello, world&#x27;
   alert(s)
 h1 I sent you an alert.
-
-
 </code></pre></section><section id="filters"><a href="#filters"><h2>filters</h2></a><p>Use any <a href="https://www.npmjs.com/browse/keyword/jstransformer">jstramsformer</a> module. For example, `npm install --save jstransformer-marked`. Arguments and parens are optional.</p><pre class="input"><code>:marked(gfm=true) ./readme.md
-</code></pre></section><section id="comments"><a href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>
+</code></pre></section><section id="comments"><a href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>// single line
 </code></pre><p>Multi-line (`.beep` and `.boop` are commented)</p><pre class="input"><code>.foo1
-
+//
   .beep
     .boop
 .foo2
-</code></pre><p><span class="red">note</span> Comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version, so they need to die. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
+</code></pre><p><span class="red">note</span> Comments have no business in compiled code, so they are removed entirely. Conditional comments are no longer supported by any IE version, so they wont be supported. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
 </code></pre></section></p><script src="./index.js"></script>

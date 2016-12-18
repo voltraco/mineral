@@ -4,7 +4,7 @@
   padding: 20%;
 }
 section {
-  padding-top: 50px;
+  padding-top: 30px;
 }
 h1,
 h2,
@@ -15,7 +15,6 @@ h4 {
 h1 {
   font-size: 2em;
   vertical-align: bottom;
-  margin-left: 20px;
   display: inline;
   text-transform: uppercase;
   line-height: 1.6em;
@@ -59,17 +58,20 @@ pre.warn {
   border-bottom: 1px solid #f00;
 }
 .hamburger {
+  opacity: 1;
+  transition: all 0.4s;
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
+  top: 20px;
+  right: 20px;
+  width: 30px;
+  height: 24px;
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
+  z-index: 20;
 }
 .hamburger .inner {
-  height: 18px;
-  border: bottom 1px solid #333;
+  height: 12px;
+  border-bottom: 1px solid #333;
 }
 nav {
   opacity: 0;
@@ -102,7 +104,7 @@ nav ul li {
 }
 nav a,
 nav a:visited {
-  transition: all 0.4s ease;
+  transition: all 0.4s;
   color: #333;
   font-size: 12px;
   text-transform: uppercase;
@@ -124,7 +126,8 @@ nav a:visited.active {
   padding: 4px;
 }
 @media screen and (max-width: 900px) {
-  nav {
+  nav,
+  .hamburger {
     display: none;
   }
 }
