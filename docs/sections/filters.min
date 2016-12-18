@@ -11,5 +11,3 @@ section#filters
   pre.input
     code.
       :marked(gfm=true) ./readme.md
-
-

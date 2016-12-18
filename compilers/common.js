@@ -66,10 +66,10 @@ exports.die = function die (info, name, message) {
 }
 
 exports.scopedExpression = function scopedExpression (data, info, str) {
-  const body = ['return ' + str + ';']
-  const args = Object.keys(data).concat(body)
+  const args = Object.keys(data).concat(['__format', 'return ' + str + ';'])
   const fn = Function.apply(null, args)
   const values = Object.keys(data).map(k => data[k])
+  values.push(fmt)
 
   try {
     return fn.apply(data, values)

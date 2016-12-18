@@ -19,16 +19,15 @@ const HYPHEN = 45
 const A = 65
 const Z = 90
 
-// determine if this is a path or just regular content
-
 function html (tree, data, location, cb) {
   let findElseBranch = false
   let logical = false
 
+  // determine if this is a path or just regular content
   function getValue (data, info, str) {
     if (!EQ_RE.test(str)) return str
     let exp = str.replace(EQ_RE, '')
-    if (FMT_RE.test(exp)) exp = 'fmt(' + exp + ')'
+    if (FMT_RE.test(exp)) exp = '__format(' + exp + ')'
     logical = true
     const value = common.scopedExpression(data, info, exp)
     return he.escape(value + '')
@@ -40,10 +39,6 @@ function html (tree, data, location, cb) {
     if (child.unescaped) {
       child.content = he.escape(child.content)
     }
-
-    //if (LINE_COMMENT_RE.test(child.tagOrSymbol)) {
-    //  return ''
-    //}
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
     //
@@ -268,7 +263,6 @@ function html (tree, data, location, cb) {
 module.exports = function (tree, data, location, cb) {
   cb = cb || common.resolveInclude
   data = data || {}
-  data.fmt = fmt
   return html(tree, data, location, cb)
 }
 

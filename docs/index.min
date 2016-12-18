@@ -30,11 +30,12 @@ body
       li
         a(href="#comments") comments
 
-  p mineral is a language that compiles to markup. It's similar to Jade (aka 
-    a(href="https://pugjs.org") pug
-    | ). its goal is to be a light-weight alternative to pug. a significantly
-    | smaller codebase, a slimmer set of features and the ability to output
-    | dom elements as well as html.
+  p
+    a(href="https://github.com/voltraco/mineral") mineral
+    | is a language that compiles to markup or dom. it's similar to Jade (aka
+    | Pug). its goal is to be a light-weight alternative to pug with a
+    | significantly smaller codebase, a slimmer set of features and the
+    | ability to integrate well with modern client side frameworks.
 
     include ./sections/tags.min
     include ./sections/mixins.min

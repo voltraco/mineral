@@ -112,18 +112,19 @@ nav a:visited.active {
     display: none;
   }
 }
-</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p>mineral is a language that compiles to markup. It's similar to Jade (aka <a href="https://pugjs.org">pug</a> ). its goal is to be a light-weight alternative to pug. a significantly smaller codebase, a slimmer set of features and the ability to output dom elements as well as html.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
+</style></head><body><header><img width="50px" height="50px" src="./logo.svg"><h1>mineral</h1></header><nav><em>mineral</em><ul><li><a class="active" href="#tags">tags</a></li><li><a href="#mixins">mixins</a></li><li><a href="#conditionals">conditionals</a></li><li><a href="#iteration">iteration</a></li><li><a href="#values">values</a></li><li><a href="#text">text</a></li><li><a href="#filters">filters</a></li><li><a href="#comments">comments</a></li></ul></nav><p><a href="https://github.com/voltraco/mineral">mineral</a> is a language that compiles to markup or dom. it's similar to Jade (aka Pug). its goal is to be a light-weight alternative to pug with a significantly smaller codebase, a slimmer set of features and the ability to integrate well with modern client side frameworks.<section id="tags"><a href="#tags"><h2>tags</h2></a><p>lowercase text at the start of a line (or after only white space) is considered an html tag. Indenting a tag will nest it, creating the tree-like structure that can be rendered into html. tag attributes look similar to html (with optional comma), but their values are regular JavaScript.</p><pre class="input"><code>html
 head
   link(href=&quot;index.css&quot; rel=&quot;stylesheet&quot;)
 body
   h1 Hello World
 </code></pre><p>the above code will produce the following html</p><pre class="output"><code>&lt;html&gt;
-&lt;head&gt;
-  &lt;link href=&quot;index.css&quot; rel=&quot;stylesheet&quot;&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1&gt;Hello World&lt;/h1&gt;
-&lt;/body&gt;
+  &lt;head&gt;
+    &lt;link href=&quot;index.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello World&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 </code></pre><p><span class="red">note</span> it's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
 </code></pre><p><span class="red">note</span> mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
 </code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>all html is lowercase, anything starting with an uppercase letter is a mixin. Arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
@@ -171,13 +172,11 @@ h1 I sent you an alert.
 
 
 </code></pre></section><section id="filters"><a href="#filters"><h2>filters</h2></a><p>Use any <a href="https://www.npmjs.com/browse/keyword/jstransformer">jstramsformer</a> module. For example, `npm install --save jstransformer-marked`. Arguments and parens are optional.</p><pre class="input"><code>:marked(gfm=true) ./readme.md
-
-
 </code></pre></section><section id="comments"><a href="#comments"><h2>comments</h2></a><p>Single-line</p><pre class="input"><code>
 </code></pre><p>Multi-line (`.beep` and `.boop` are commented)</p><pre class="input"><code>.foo1
 
   .beep
     .boop
 .foo2
-</code></pre><p><span class="red">note</span> comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
+</code></pre><p><span class="red">note</span> comments have no business in compiled code, so unlike jade/pug they are completely removed. Conditional comments are no longer supported by any IE version, so they need to die. If for some reason you really want comments, you can use the comment tag.</p><pre class="input"><code>comment Hey good lookin&#x27;</code></pre><pre class="output"><code>&lt;!-- Hey good lookin&#x27; --&gt;
 </code></pre></section></p><script src="./index.js"></script>

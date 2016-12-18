@@ -21,12 +21,13 @@ section#tags
   pre.output
     code.
       <html>
-      <head>
-        <link href="index.css" rel="stylesheet">
-      </head>
-      <body>
-        <h1>Hello World</h1>
-      </body>
+        <head>
+          <link href="index.css" rel="stylesheet">
+        </head>
+        <body>
+          <h1>Hello World</h1>
+        </body>
+      </html>
 
   p
     span.red note

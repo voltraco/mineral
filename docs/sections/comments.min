@@ -23,8 +23,8 @@ section#comments
     span.red note
     | comments have no business in compiled code, so unlike jade/pug they are
     | completely removed. Conditional comments are no longer supported by any IE
-    | version. If for some reason you really want comments, you can use the
-    | comment tag.
+    | version, so they need to die. If for some reason you really want comments,
+    | you can use the comment tag.
   pre.input
     code.
       comment Hey good lookin'
