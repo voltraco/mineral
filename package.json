@@ -6,7 +6,7 @@
   "bin": "bin/min",
   "scripts": {
     "test": "node test/cases.js",
-    "build": "./bin/min ./docs/index.min -o ./docs"
+    "build": "./bin/min ./docs/src/index.min -o ./docs"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,6 @@
   "homepage": "https://github.com/voltraco/mineral#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
-    "browserify": "^13.0.0",
     "domready": "^1.0.8",
     "faucet": "0.0.1",
     "jade": "^1.11.0",
@@ -35,6 +34,7 @@
     "he": "^1.1.0",
     "jstransformer": "^1.0.0",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "node-chrome": "^1.2.3"
   }
 }

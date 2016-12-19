@@ -19,7 +19,7 @@ const Z = 90
 
 // *** experiment with creating dom nodes ***
 
-function dom (tree, data, location, cb) {
+function dom (tree, node, data) {
   let findElseBranch = false
   let logical = false
 
@@ -33,7 +33,7 @@ function dom (tree, data, location, cb) {
   }
 
   function compile(child, index) {
-    if (child.html) return child.html
+    if (child.dom) return node.appendChild(child.dom)
 
     if (child.unescaped) {
       child.content = he.escape(child.content)
@@ -51,43 +51,43 @@ function dom (tree, data, location, cb) {
         const exp = child.content.replace(IF_RE, '')
         if (common.scopedExpression(data, child.pos, exp)) {
           findElseBranch = false
-          return dom(child, data, location, cb)
+          const children = dom(child, node, data)
+          if (children) node.appendChild(children)
         }
-        return ''
+        return
       }
 
-      if (!findElseBranch) return ''
+      if (!findElseBranch) return
 
       findElseBranch = false
-      return dom(child, data, location, cb)
+      const children = dom(child, node, data)
+      if (children) node.appendChild(children)
     }
 
     // if we are searching for an else branch, forget everything else.
     if (findElseBranch) {
       if (index == tree.children.length - 1) throw new Error('missing else')
-      return ''
-    }
-
-    if (child.tagOrSymbol === 'comment') {
-      return '<!-- ' + child.content + ' -->'
+      return
     }
 
     if (child.tagOrSymbol === 'if') {
       logical = true
       if (common.scopedExpression(data, child.pos, child.content)) {
-        return dom(child, data, location, cb)
+        const children = dom(child, node, data)
+        if (children) node.appendChild(children)
       }
       findElseBranch = true
-      return ''
+      return
     }
 
     if (child.tagOrSymbol === 'while') {
       logical = true
       let value = ''
       while (common.scopedExpression(data, child.pos, child.content)) {
-        value += dom(child, data, location, cb)
+        const children = dom(child, node, data)
+        if (children) node.appendChild(children)
       }
-      return value
+      return
     }
 
     if (child.tagOrSymbol === 'for') {
@@ -111,7 +111,7 @@ function dom (tree, data, location, cb) {
         }
         // create a new shallow scope so that locals don't persist
         const scope = Object.assign({}, data, locals)
-        value += dom(child, scope, location, cb)
+        value += dom(child, node, scope)
       })
       return value
     }
@@ -122,7 +122,7 @@ function dom (tree, data, location, cb) {
 
     // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
-      return (' ' + getValue(data, child.pos, child.content))
+      return node.textContent += getValue(data, child.pos, child.content)
     }
 
     if (firstLetter === HYPHEN) {
@@ -159,7 +159,7 @@ function dom (tree, data, location, cb) {
 
       cache[name].keys.map((k, index) => (locals[k] = args[index]))
       const scope = Object.assign({}, data, locals)
-      return dom(cache[name].child, scope, location, cb)
+      return dom(cache[name].child, node, scope)
     }
 
     // defines a mixin
@@ -167,20 +167,7 @@ function dom (tree, data, location, cb) {
       logical = true
       const keys = Object.keys(child.attributes)
       cache[child.tagOrSymbol] = { child, keys }
-      return ''
-    }
-
-    if (child.tagOrSymbol === 'include') {
-      // pass location to the cb so includes can be relative
-      logical = true
-      const path = child.content
-
-      // if the include is not a .min extension, it's plain text
-      if (MIN_FILE_RE.test(path)) {
-        const resolved = cb({ path, location }, true)
-        return dom(resolved.tree, data, resolved.location, cb)
-      }
-      return cb({ path, location })
+      return
     }
 
     //
@@ -188,15 +175,10 @@ function dom (tree, data, location, cb) {
     //
     const props = common.resolveTagOrSymbol(child.tagOrSymbol)
 
-    let tag = ['<', props.tagname]
+    let el = document.createElement(props.tagname)
 
-    if (props.id) {
-      tag.push(' id="', props.id, '"')
-    }
-
-    if (props.classname) {
-      tag.push(' class="', props.classname, '"')
-    }
+    if (props.id) el.id = props.id
+    if (props.classname) el.classname = props.classname
 
     if (child.attributes) {
       let attrs = Object.keys(child.attributes).map(key => {
@@ -205,7 +187,7 @@ function dom (tree, data, location, cb) {
 
         // if this attribute is a boolean, make its value its key
         if (typeof value === 'boolean') {
-          return [key, '=', `"${key}"`].join('')
+          el.setAttribute(key, true)
         }
 
         if (value) {
@@ -213,7 +195,7 @@ function dom (tree, data, location, cb) {
           value = common.scopedExpression(data, child.pos, value)
 
           // a class should not be empty
-          if (key === 'class' && !value) return ''
+          if (key === 'class' && !value) return
 
           // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
@@ -222,43 +204,34 @@ function dom (tree, data, location, cb) {
             value = JSON.stringify(value)
           }
         }
-        return [key, '=', value].join('')
+        el.setAttribute(key, value)
       })
-      attrs = attrs.filter(a => !!a)
-      if (attrs.length) tag.push(' ', attrs.join(' '))
     }
 
-    tag.push('>') // html5 doesn't care about self closing tags
-
     if (child.content) {
-      tag.push(getValue(data, child.pos, child.content))
+      el.textContent += getValue(data, child.pos, child.content)
     }
 
     // nothing left to decide, recurse if there are child nodes
     if (child.children.length) {
-      tag.push(dom(child, data, location, cb))
+      const children = dom(child, node, data)
+      if (children) el.appendChild(children)
     }
 
-    // decide if the tag needs to be closed or not
-    if (common.unclosed.indexOf(props.tagname) === -1) {
-      tag.push('</', props.tagname, '>')
-    }
-
-    var s = tag.join('')
     // if this is not a logical node, we can make an optimization
-    if (!logical) child.html = s
-    return s
+    if (!logical) child.dom = el
+    node.appendChild(el)
   }
 
   if (tree.children && tree.children.length) {
-    return tree.children.map(compile).join('')
+    tree.children.map(compile)
   }
-  return ''
+  return node
 }
 
-module.exports = function (tree, data, location, cb) {
-  cb = () => {}
+module.exports = function compiler (tree, data) {
   data = data || {}
-  return dom(tree, data, location, cb)
+  const node = document.createDocumentFragment()
+  return dom(tree, node, data)
 }
 
