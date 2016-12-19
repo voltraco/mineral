@@ -70,11 +70,18 @@ function dom (tree, node, data) {
       return
     }
 
+    if (child.tagOrSymbol === 'comment') {
+      const comment = document.createComment(child.content)
+      node.appendChild(comment)
+      return
+    }
+
     if (child.tagOrSymbol === 'if') {
       logical = true
       if (common.scopedExpression(data, child.pos, child.content)) {
         const children = dom(child, node, data)
         if (children) node.appendChild(children)
+        return
       }
       findElseBranch = true
       return
@@ -178,7 +185,7 @@ function dom (tree, node, data) {
     let el = document.createElement(props.tagname)
 
     if (props.id) el.id = props.id
-    if (props.classname) el.classname = props.classname
+    if (props.classname) el.className = props.classname
 
     if (child.attributes) {
       let attrs = Object.keys(child.attributes).map(key => {
@@ -199,9 +206,9 @@ function dom (tree, node, data) {
 
           // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
-            value = he.escape(JSON.stringify(value))
-          } else {
             value = JSON.stringify(value)
+          } else {
+            //value = JSON.stringify(value)
           }
         }
         el.setAttribute(key, value)

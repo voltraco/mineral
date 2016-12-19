@@ -69,7 +69,7 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'comment') {
-      return '<!-- ' + child.content + ' -->'
+      return '<!--' + child.content + '-->'
     }
 
     if (child.tagOrSymbol === 'if') {

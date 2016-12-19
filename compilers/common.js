@@ -8,8 +8,8 @@ const CLASS_RE = /\.[^.]+/g
 const ID_RE = /#[^. ]+/g
 
 exports.unclosed = [
-  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'html',
-  'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr', 'body',
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr',
   'doctype'
 ]
 
