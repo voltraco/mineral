@@ -53,23 +53,19 @@ function dom (tree, node, data) {
         const exp = child.content.replace(IF_RE, '')
         if (common.scopedExpression(data, child.pos, exp)) {
           findElseBranch = false
-          const children = dom(child, node, data)
-          if (children) node.appendChild(children)
+          const branch = document.createDocumentFragment()
+          const children = dom(child, branch, data)
+          if (children) node.appendChild(branch)
         }
         return
       }
 
       findElseBranch = false
-      const children = dom(child, node, data)
-      if (children) node.appendChild(children)
+      const branch = document.createDocumentFragment()
+      const children = dom(child, branch, data)
+      if (children) node.appendChild(branch)
       return
     }
-
-    // if we are searching for an else branch, forget everything else.
-    //if (findElseBranch) {
-    //  if (index == tree.children.length - 1) throw new Error('missing else')
-    //  return
-    //}
 
     if (child.tagOrSymbol === 'comment') {
       const comment = document.createComment(child.content)
@@ -80,9 +76,9 @@ function dom (tree, node, data) {
     if (child.tagOrSymbol === 'if') {
       logical = true
       if (common.scopedExpression(data, child.pos, child.content)) {
-        const children = dom(child, node, data)
-        console.log(node.innerHTML)
-        if (children) node.appendChild(children)
+        const branch = document.createDocumentFragment()
+        const children = dom(child, branch, data)
+        if (children) node.appendChild(branch)
         return
       }
       findElseBranch = true
