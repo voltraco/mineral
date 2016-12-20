@@ -49,8 +49,8 @@ if (argv.d) {
 const deps = {}
 const recent = []
 
-const log = (symbol, event, s, ...args) => {
-  const msg = [chalk.white(symbol), chalk.blue(event), s]
+const log = (event, s, ...args) => {
+  const msg = ['  ', chalk.blue(event), s]
   console.log(msg.join(' '), ...args)
 }
 
@@ -60,40 +60,56 @@ function trunc (s) {
   return s
 }
 
+function findCommonPath () {
+  if (argv._.length === 1) {
+    return path.dirname(first)
+  }
+
+  const first = argv._[0].split(path.sep)
+  const second = argv._[1].split(path.sep)
+  let buf = []
+
+  first.some((seg, i) => {
+    const match = first[i] === second[i]
+    if (match) buf.push(seg)
+    return !match
+  })
+  return path.resolve(path.join(...buf))
+}
+
+const common = findCommonPath()
+
 function compileFile (file) {
 
   if (deps[file]) file = deps[file]
 
-  const sourcefile = path.resolve(file)
-  const source = fs.readFileSync(sourcefile, 'utf8')
-  // console.log(require('util').inspect(parse(source), { colors: true, depth: null }))
-  const html = compile(parse(source), data, sourcefile)
+  const sourcepath = path.resolve(file)
+  const sourcetree = fs.readFileSync(sourcepath, 'utf8')
+  const html = compile(parse(sourcetree), data, sourcepath)
 
   if (!argv.o) {
     return process.stdout.write(html + '\n')
   }
 
-  const outdir = path.dirname(sourcefile)
-
   const out = path.join(
-    path.resolve(outdir),
-    path.relative(outdir, argv.o)
+    path.resolve(argv.o),
+    path.dirname(sourcepath.replace(common, ''))
   )
 
   mkdirp.sync(out)
 
   try {
-    const destfile = sourcefile.replace(/\.min$/, '.html')
+    const destfile = sourcepath.replace(/\.min$/, '.html')
     const target = path.join(out, path.basename(destfile))
     fs.writeFileSync(target, html)
-    log(' ✓ ', 'compiled', trunc(file))
+    log('compiled', trunc(destfile))
   } catch (ex) {
     console.error(ex)
     process.exit(1)
   }
 }
 
-argv._.map(compileFile)
+argv._.forEach(compileFile)
 
 if (argv.w) {
 
@@ -111,14 +127,14 @@ if (argv.w) {
 
     deps[target] = origin
     watcher.add(target)
-    log(' · ', 'watching', '%s -> %s', trunc(origin), trunc(target))
+    log('watching', '%s -> %s', trunc(origin), trunc(target))
   }
 
   function onReady() {
     const watched = watcher.getWatched()
     Object.keys(watched).map(p => watched[p].map(f => {
       const target = path.join(p, f)
-      log(' · ', 'watching', trunc(target))
+      log('watching', trunc(target))
     }))
   }
 
