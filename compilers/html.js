@@ -45,6 +45,8 @@ function html (tree, data, location, cb) {
     // first handle any flow control statements
     //
     if (child.tagOrSymbol === 'else') {
+      if (!findElseBranch) return ''
+
       logical = true
       // if this is an else-if
       if (IF_RE.test(child.content)) {
@@ -55,8 +57,6 @@ function html (tree, data, location, cb) {
         }
         return ''
       }
-
-      if (!findElseBranch) return ''
 
       findElseBranch = false
       return html(child, data, location, cb)

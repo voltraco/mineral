@@ -45,6 +45,8 @@ function dom (tree, node, data) {
     // first handle any flow control statements
     //
     if (child.tagOrSymbol === 'else') {
+      if (!findElseBranch) return
+
       logical = true
       // if this is an else-if
       if (IF_RE.test(child.content)) {
@@ -57,18 +59,17 @@ function dom (tree, node, data) {
         return
       }
 
-      if (!findElseBranch) return
-
       findElseBranch = false
       const children = dom(child, node, data)
       if (children) node.appendChild(children)
+      return
     }
 
     // if we are searching for an else branch, forget everything else.
-    if (findElseBranch) {
-      if (index == tree.children.length - 1) throw new Error('missing else')
-      return
-    }
+    //if (findElseBranch) {
+    //  if (index == tree.children.length - 1) throw new Error('missing else')
+    //  return
+    //}
 
     if (child.tagOrSymbol === 'comment') {
       const comment = document.createComment(child.content)
@@ -80,6 +81,7 @@ function dom (tree, node, data) {
       logical = true
       if (common.scopedExpression(data, child.pos, child.content)) {
         const children = dom(child, node, data)
+        console.log(node.innerHTML)
         if (children) node.appendChild(children)
         return
       }
@@ -105,7 +107,6 @@ function dom (tree, node, data) {
 
       const object = common.scopedExpression(data, child.pos, parts[1])
 
-      let value = ''
       common.each(object, function (val, key) {
         // determine if there are identifiers for key and value
         const identifiers = parts[0].split(',')
@@ -118,9 +119,10 @@ function dom (tree, node, data) {
         }
         // create a new shallow scope so that locals don't persist
         const scope = Object.assign({}, data, locals)
-        value += dom(child, node, scope)
+        const children = dom(child, node, scope)
+        if (children) node.appendChild(children)
       })
-      return value
+      return
     }
 
     if (child.tagOrSymbol === 'each') {
@@ -148,7 +150,8 @@ function dom (tree, node, data) {
       const path = child.content
       const data = cb({ path, location })
       const parsed = t.render(data.tree, child.attributes)
-      return parsed.body
+      node.textContent += parsed.body
+      return
     }
 
     // anything prefixed with '+' is a mixin call.
@@ -166,7 +169,9 @@ function dom (tree, node, data) {
 
       cache[name].keys.map((k, index) => (locals[k] = args[index]))
       const scope = Object.assign({}, data, locals)
-      return dom(cache[name].child, node, scope)
+      const children = dom(cache[name].child, node, scope)
+      node.appendChild(children)
+      return
     }
 
     // defines a mixin
@@ -194,7 +199,7 @@ function dom (tree, node, data) {
 
         // if this attribute is a boolean, make its value its key
         if (typeof value === 'boolean') {
-          el.setAttribute(key, true)
+          el.setAttribute(key, key)
         }
 
         if (value) {
@@ -221,8 +226,8 @@ function dom (tree, node, data) {
 
     // nothing left to decide, recurse if there are child nodes
     if (child.children.length) {
-      const children = dom(child, node, data)
-      if (children) el.appendChild(children)
+      const children = dom(child, el, data)
+      if (children) node.appendChild(children)
     }
 
     // if this is not a logical node, we can make an optimization
