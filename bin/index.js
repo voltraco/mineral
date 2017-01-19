@@ -7,7 +7,6 @@ const chalk = require('chalk')
 
 const compile = require('../compilers/html')
 const parse = require('../parser')
-const readdirSync = require('./readdirsync')
 
 const argv = minimist(process.argv.slice(2))
 
@@ -47,10 +46,9 @@ if (argv.d) {
 }
 
 const deps = {}
-const recent = []
 
 const log = (event, s, ...args) => {
-  const msg = ['  ', chalk.blue(event), s]
+  const msg = [' ', chalk.blue(event), s]
   console.log(msg.join(' '), ...args)
 }
 
@@ -62,25 +60,18 @@ function trunc (s) {
 
 function findCommonPath () {
   if (argv._.length === 1) {
-    return path.dirname(first)
+    return path.dirname(argv._[0])
   }
 
-  const first = argv._[0].split(path.sep)
-  const second = argv._[1].split(path.sep)
-  let buf = []
-
-  first.some((seg, i) => {
-    const match = first[i] === second[i]
-    if (match) buf.push(seg)
-    return !match
+  const p = argv._.reduce((a, b) => {
+    a = Array.isArray(a) ? a : a.split(path.sep)
+    b = Array.isArray(b) ? b : b.split(path.sep)
+    return a.filter((s, i) => s === b[i])
   })
-  return path.resolve(path.join(...buf))
+  return p.join(path.sep)
 }
 
-const common = findCommonPath()
-
 function compileFile (file) {
-
   if (deps[file]) file = deps[file]
 
   const sourcepath = path.resolve(file)
@@ -90,6 +81,8 @@ function compileFile (file) {
   if (!argv.o) {
     return process.stdout.write(html + '\n')
   }
+
+  let common = path.resolve(findCommonPath())
 
   const out = path.join(
     path.resolve(argv.o),
@@ -111,8 +104,15 @@ function compileFile (file) {
 
 argv._.forEach(compileFile)
 
-if (argv.w) {
+function onReady () {
+  const watched = global.watcher.getWatched()
+  Object.keys(watched).map(p => watched[p].map(f => {
+    const target = path.join(p, f)
+    log('watching', trunc(target))
+  }))
+}
 
+if (argv.w) {
   global.watcher = chokidar
     .watch(argv._, { persistent: true, atomic: true })
     .on('add', path => compileFile(path))
@@ -126,16 +126,8 @@ if (argv.w) {
     if (deps[target]) return
 
     deps[target] = origin
-    watcher.add(target)
+    global.watcher.add(target)
     log('watching', '%s -> %s', trunc(origin), trunc(target))
-  }
-
-  function onReady() {
-    const watched = watcher.getWatched()
-    Object.keys(watched).map(p => watched[p].map(f => {
-      const target = path.join(p, f)
-      log('watching', trunc(target))
-    }))
   }
 
   global.watcher.on('ready', onReady)
