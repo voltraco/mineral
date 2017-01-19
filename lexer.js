@@ -36,7 +36,7 @@ module.exports = function Lexer (str, options) {
     const str = m[0]
     updatePosition(str)
     lexer.source = lexer.source.slice(m.index + str.length)
-    //console.log('>', arguments.callee.caller.name, "'" + m + "'")
+    // console.log('>', arguments.callee.caller.name, "'" + m + "'")
     return m
   }
 
@@ -169,7 +169,7 @@ module.exports = function Lexer (str, options) {
   }
 
   pm.value = function value () {
-    let value = ''
+    let val = ''
     let openSingle = false
     let openDouble = false
     let openBrace = false
@@ -193,7 +193,7 @@ module.exports = function Lexer (str, options) {
       else if (ch === '(') openParen = true
       else if (ch === ')') openParen = false
 
-      let closed = !openSingle && !openDouble && 
+      let closed = !openSingle && !openDouble &&
         !openBracket && !openBrace && !openParen
 
       if (closed && /[\r\n,]/.test(ch)) break
@@ -202,13 +202,13 @@ module.exports = function Lexer (str, options) {
       // find an operator, we can asume that this is not an expression, it
       // must be the end of the value.
       if (closed && EOV_RE.test(next)) {
-        //value += ch
+        // val += ch
         break
       }
-      value += ch
+      val += ch
       if (!lexer.length()) break
     }
-    return value
+    return val
   }
 
   pm.word = function word () {
@@ -235,7 +235,7 @@ module.exports = function Lexer (str, options) {
     let value = ''
     let lastch = ''
 
-    while(true) {
+    while (true) {
       let ch = lexer.peek(0, 1)
 
       if (ch === '/' && !preserveComments) {
