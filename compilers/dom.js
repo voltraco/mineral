@@ -1,18 +1,15 @@
 const he = require('he')
 const common = require('./common')
-const fmt = require('util').format
+// const fmt = require('util').format
 const cache = {}
 
 const IF_RE = /^\s*if\s*/
 const IN_RE = /\s*in\s*/
-const LINE_COMMENT_RE = /^\/\//
 const FMT_RE = /["'](.*?)["'], /
-const MIN_FILE_RE = /\.min$/
 const EQ_RE = /^\s*=\s*/
-const QUOTE_RE = /^"|'/
 
-const COLON = 58
-const PLUS = 43
+// const COLON = 58
+// const PLUS = 43
 const HYPHEN = 45
 const A = 65
 const Z = 90
@@ -29,10 +26,10 @@ function dom (tree, node, data) {
     if (FMT_RE.test(exp)) exp = '__format(' + exp + ')'
     logical = true
     const value = common.scopedExpression(data, info, exp)
-    return he.escape(value + '')
+    return value // he.escape(value + '')
   }
 
-  function compile(child, index) {
+  function compile (child, index) {
     if (child.dom) return node.appendChild(child.dom)
 
     if (child.unescaped) {
@@ -87,7 +84,6 @@ function dom (tree, node, data) {
 
     if (child.tagOrSymbol === 'while') {
       logical = true
-      let value = ''
       while (common.scopedExpression(data, child.pos, child.content)) {
         const children = dom(child, node, data)
         if (children) node.appendChild(children)
@@ -127,14 +123,14 @@ function dom (tree, node, data) {
 
     // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
-      return node.textContent += getValue(data, child.pos, child.content)
+      return (node.textContent += getValue(data, child.pos, child.content))
     }
 
     if (firstLetter === HYPHEN) {
       common.die(child.pos, 'Error', 'No inline code!')
     }
 
-    if (firstLetter === COLON && cb) {
+    /* if (firstLetter === COLON && cb) {
       logical = true
       const name = 'jstransformer-' + child.tagOrSymbol.slice(1)
       let t = null
@@ -168,7 +164,7 @@ function dom (tree, node, data) {
       const children = dom(cache[name].child, node, scope)
       node.appendChild(children)
       return
-    }
+    } */
 
     // defines a mixin
     if (firstLetter >= A && firstLetter <= Z) {
@@ -189,8 +185,7 @@ function dom (tree, node, data) {
     if (props.classname) el.className = props.classname
 
     if (child.attributes) {
-      let attrs = Object.keys(child.attributes).map(key => {
-
+      Object.keys(child.attributes).map(key => {
         let value = child.attributes[key]
 
         // if this attribute is a boolean, make its value its key
@@ -201,15 +196,14 @@ function dom (tree, node, data) {
         if (value) {
           // all values are expressions
           value = common.scopedExpression(data, child.pos, value)
-
           // a class should not be empty
           if (key === 'class' && !value) return
 
           // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
-            value = JSON.stringify(value)
-          } else {
-            //value = JSON.stringify(value)
+            if (typeof value !== 'string' && typeof value !== 'number') {
+              value = JSON.stringify(value)
+            }
           }
         }
         el.setAttribute(key, value)

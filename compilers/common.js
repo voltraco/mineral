@@ -78,7 +78,7 @@ exports.scopedExpression = function scopedExpression (data, info, str) {
   }
 }
 
-exports.each = function each(o, f) {
+exports.each = function each (o, f) {
   const has = Object.prototype.hasOwnProperty
   if (Array.isArray(o)) {
     for (let i = 0; i < o.length; ++i) {

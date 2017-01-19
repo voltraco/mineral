@@ -33,7 +33,7 @@ function html (tree, data, location, cb) {
     return he.escape(value + '')
   }
 
-  function compile(child, index) {
+  function compile (child, index) {
     if (child.html) return child.html
 
     if (child.unescaped) {
@@ -204,7 +204,6 @@ function html (tree, data, location, cb) {
 
     if (child.attributes) {
       let attrs = Object.keys(child.attributes).map(key => {
-
         let value = child.attributes[key]
 
         // if this attribute is a boolean, make its value its key
@@ -221,7 +220,11 @@ function html (tree, data, location, cb) {
 
           // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
-            value = he.escape(JSON.stringify(value))
+            if (typeof value !== 'string' && typeof value !== 'number') {
+              value = he.escape(JSON.stringify(value))
+            } else {
+              value = '"' + value + '"'
+            }
           } else {
             value = JSON.stringify(value)
           }
