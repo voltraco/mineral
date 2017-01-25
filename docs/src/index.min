@@ -28,11 +28,10 @@ html
           a(href="#comments") comments
 
     p
-      a(href="https://github.com/voltraco/mineral") Mineral
-      | is a tiny language that compiles to markup or dom trees. It's similar
-      | to Jade (aka Pug). Its goal is to be a light-weight alternative to pug
-      | with a significantly smaller codebase, a slimmer set of features and
-      | the ability to integrate well with modern client side frameworks.
+      a(href="https://github.com/voltraco/mineral") Mineral 
+      | is a language that compiles to markup or dom. It's similar to Jade (aka
+      | Pug). Its goal is to be much smaller and simpler than pug, and integrate
+      | well with modern client side frameworks.
 
       include ./sections/tags.min
       include ./sections/mixins.min
