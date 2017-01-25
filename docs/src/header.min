@@ -7,7 +7,7 @@ head
     :stylus ./index.styl
 
   // Title
-  title Foo
+  title Mineral
 
   meta(name="description" content="A terse language that compiles to html and dom trees")
 
