@@ -1,7 +1,14 @@
-mineral is a language that compiles to markup or dom. it's similar to Jade (aka
-Pug). its goal is to be a light-weight alternative to pug with a significantly
-smaller codebase, a slimmer set of features and the ability to integrate well
-with modern client side frameworks.
+ABOUT
+Mineral is a language that compiles to markup or dom. It's similar to Jade (aka
+Pug). Its goal is to be smaller than pug and integrate well with modern client
+side frameworks.
 
-More here -- http://voltraco.github.io/mineral/
+DOCS
+http://voltraco.github.io/mineral/
+
+INSTALL
+npm i mineral
+
+HELP
+mineral -h
 
