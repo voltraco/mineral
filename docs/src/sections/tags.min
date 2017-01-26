@@ -43,7 +43,7 @@ section#tags
     code.
       .band The Misfits
   pre
-    code
+    code.
       <div class="band">The Misfits</div>
   p
     span.red note
@@ -60,6 +60,6 @@ section#tags
     code.
       #danzig.band The Misfits
   pre
-    code
+    code.
       <div id="danzig" class="band">The Misfits</div>
 
