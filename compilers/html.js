@@ -1,5 +1,6 @@
 const transformer = require('jstransformer')
 const he = require('he')
+const resFrom = require('resolve-from')
 const common = require('./common')
 const fmt = require('util').format
 
@@ -7,11 +8,9 @@ global.cache = {}
 
 const IF_RE = /^\s*if\s*/
 const IN_RE = /\s*in\s*/
-const LINE_COMMENT_RE = /^\/\//
 const FMT_RE = /["'](.*?)["'], /
 const MIN_FILE_RE = /\.min$/
 const EQ_RE = /^\s*=\s*/
-const QUOTE_RE = /^"|'/
 
 const COLON = 58
 const PLUS = 43
@@ -64,7 +63,7 @@ function html (tree, data, location, cb) {
 
     // if we are searching for an else branch, forget everything else.
     if (findElseBranch) {
-      if (index == tree.children.length - 1) throw new Error('missing else')
+      if (index === tree.children.length - 1) throw new Error('missing else')
       return ''
     }
 
@@ -133,10 +132,12 @@ function html (tree, data, location, cb) {
       logical = true
       const name = 'jstransformer-' + child.tagOrSymbol.slice(1)
       let t = null
+
       try {
-        t = transformer(require(name))
+        t = transformer(require(resFrom('.', name)))
       } catch (ex) {
-        common.die(child.pos, 'Error', fmt('%s not installed', name))
+        const msg = fmt('%s could not load (%s)', name, ex.message)
+        common.die(child.pos, 'Error', msg)
       }
       const path = child.content
       const data = cb({ path, location })
