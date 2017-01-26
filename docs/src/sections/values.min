@@ -1,11 +1,11 @@
 section#values
 
   a(id="values" href="#values")
-    h2 dynamic values
+    h2 values
 
-  p The `=` symbol indicates that the value should be an expression. An
-    | expression can include values from the data passed to the template or
-    | any valid javascript.
+  p When the `=` symbol follows a tag, it indicates that the value should be an
+    | expression. An expression can include values from the data passed to the
+    | template or any valid javascript.
 
   pre.input
     code.

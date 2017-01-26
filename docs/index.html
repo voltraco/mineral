@@ -174,7 +174,7 @@ else
 </code></pre><p>while loops evaluate a javascript expression until it becomes falsey.</p><pre class="input"><code>ul
   while count--
     span.name= people[count].first
-</code></pre></section><section id="values"><a id="values" href="#values"><h2>dynamic values</h2></a><p>The `=` symbol indicates that the value should be an expression. An expression can include values from the data passed to the template or any valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
+</code></pre></section><section id="values"><a id="values" href="#values"><h2>values</h2></a><p>When the `=` symbol follows a tag, it indicates that the value should be an expression. An expression can include values from the data passed to the template or any valid javascript.</p><pre class="input"><code>h1 = &#x27;Hello, &#x27; + name
 </code></pre><p>Mineral detects `console.log`-like statements.</p><pre class="input"><code>h1 = &#x27;Hello %s&#x27;, foo
 </code></pre></section><section id="text"><a id="text" href="#text"><h2>text</h2></a><p>To continue the text content of a tag, you can use the `|` symbol.</p><pre class="input"><code>p Danzig is an American heavy metal band, formed in 1987 in Lodi,
 | New Jersey, United States. The band is the musical outlet for singer
