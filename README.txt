@@ -9,6 +9,6 @@ http://voltraco.github.io/mineral/
 INSTALL
 npm i mineral
 
-HELP
-mineral -h
+CLI
+https://github.com/voltraco/mineral-cli
 
