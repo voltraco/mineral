@@ -37,6 +37,7 @@ section#tags
     code.
       a(href='/save' data-date=(new Date()))
 
+  br
   p A tag that starts with a dot will be considered a div, and the name will
     | be used as the class.
   pre
@@ -54,8 +55,9 @@ section#tags
       a(href='/save').button save // Bad
       a.button(href='/save') // Good
 
+  br
   p A tag that starts with a hash will be considered a div, and the name will
-    | be used as the id. It's fine for the id to come begore or after the class.
+    | be used as the id. It's fine for the id to come before or after the class.
   pre
     code.
       #danzig.band The Misfits
