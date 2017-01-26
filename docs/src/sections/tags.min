@@ -35,12 +35,31 @@ section#tags
     | attribute values.
   pre.warn
     code.
-      a(href='/save' date=(new Date()))
+      a(href='/save' data-date=(new Date()))
 
+  p A tag that starts with a dot will be considered a div, and the name will
+    | be used as the class.
+  pre
+    code.
+      .band The Misfits
+  pre
+    code
+      <div class="band">The Misfits</div>
   p
     span.red note
-    | Mineral does not support the (rather superfluous) class-after-attribute
-    | syntax.
+    | Unlike Jade or Pug, Mineral does not support the (rather superfluous)
+    | class-after-attribute syntax.
   pre.warn
     code.
-      a(href='/save').button save
+      a(href='/save').button save // Bad
+      a.button(href='/save') // Good
+
+  p A tag that starts with a hash will be considered a div, and the name will
+    | be used as the id. It's fine for the id to come begore or after the class.
+  pre
+    code.
+      #danzig.band The Misfits
+  pre
+    code
+      <div id="danzig" class="band">The Misfits</div>
+

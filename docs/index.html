@@ -144,9 +144,10 @@ body
     &lt;h1&gt;Hello World&lt;/h1&gt;
   &lt;/body&gt;
 &lt;/html&gt;
-</code></pre><p><span class="red">note</span> It's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; date=(new Date()))
-</code></pre><p><span class="red">note</span> Mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save
-</code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>All html is lowercase, anything starting with an uppercase letter is a mixin. arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
+</code></pre><p><span class="red">note</span> It's ideal to disambiguate expressions or declarations when using them as attribute values.</p><pre class="warn"><code>a(href=&#x27;/save&#x27; data-date=(new Date()))
+</code></pre><p>A tag that starts with a dot will be considered a div, and the name will be used as the class.</p><pre><code>.band The Misfits</code></pre><pre><code><<div>class="band">The Misfits</div></<div></code></pre><p><span class="red">note</span> Unlike Jade or Pug, Mineral does not support the (rather superfluous) class-after-attribute syntax.</p><pre class="warn"><code>a(href=&#x27;/save&#x27;).button save // Bad
+a.button(href=&#x27;/save&#x27;) // Good
+</code></pre><p>A tag that starts with a hash will be considered a div, and the name will be used as the id. It's fine for the id to come begore or after the class.</p><pre><code>#danzig.band The Misfits</code></pre><pre><code><<div>id="danzig" class="band">The Misfits</div></<div></code></pre></section><section id="mixins"><a id="mixins" href="#mixins"><h2>mixins</h2></a><p>All html is lowercase, anything starting with an uppercase letter is a mixin. arguments and parens are optional. mixins are global (less fiddling  with paths).<pre class="input"><code>Person(firstName, lastName)
   h1= firstName
   h2= lastName
 </code></pre></p><p>use mixins by putting a `+` before the name of the mixin. Arguments and parens are optional.<pre class="input"><code>+Person(&#x27;Jello&#x27;, &#x27;Biafra&#x27;)
