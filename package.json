@@ -1,6 +1,6 @@
 {
   "name": "mineral",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "he": "^1.1.0",
-    "jstransformer": "^1.0.0"
+    "jstransformer": "^1.0.0",
+    "resolve-from": "^2.0.0"
   }
 }
