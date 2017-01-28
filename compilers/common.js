@@ -1,6 +1,7 @@
 const fs = require('fs')
 const fmt = require('util').format
 const path = require('path')
+const callsites = require('callsites')
 
 const parse = require('../parser')
 
@@ -37,7 +38,21 @@ exports.resolveTagOrSymbol = function resolveTagOrSymbol (string) {
 }
 
 exports.resolveInclude = function resolver (info, shouldParse) {
-  let dirname = info.location || process.cwd()
+  let dirname = info.location
+
+  const cs = callsites()
+
+  if (!dirname && cs.length) {
+    for (let c of cs) {
+      cs.shift()
+      const f = c.getFileName()
+      const index = f.indexOf('/mineral/index') > -1
+      if (index) break
+    }
+
+    if (cs[1]) dirname = path.dirname(cs[1].getFileName())
+  }
+
   let stat = null
 
   try {
@@ -81,14 +96,9 @@ exports.scopedExpression = function scopedExpression (data, info, str) {
 exports.each = function each (o, f) {
   const has = Object.prototype.hasOwnProperty
   if (Array.isArray(o)) {
-    for (let i = 0; i < o.length; ++i) {
-      f.call(null, o[i], i) }
+    for (let i = 0; i < o.length; ++i) f(o[i], i)
   } else {
-    for (let k in o) {
-      if (has.call(o, k)) {
-        f.call(null, o[k], k)
-      }
-    }
+    for (let k in o) if (has.call(o, k)) f(o[k], k)
   }
 }
 
