@@ -4,7 +4,7 @@
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "scripts": {
-    "test": "node test/cases.js",
+    "test": "node test/mixins.js && node test/cases.js",
     "build": "./node_modules/.bin/min ./docs/src/index.min -o ./docs"
   },
   "repository": {
