@@ -76,6 +76,7 @@ exports.resolveInclude = function resolver (info, shouldParse) {
 exports.die = function die (info, name, message) {
   const msg = fmt('%s:%d:%d', message, info.column, info.lineno)
   const err = new Error(msg)
+  err.stack = ''
   err.name = name
   throw err
 }

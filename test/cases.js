@@ -12,13 +12,11 @@ let files = fs.readdirSync(path.join(__dirname, 'cases'))
 files = unique(files.map(file => file.replace(path.extname(file), '')))
 
 const data = {}
-data['attrs-data'] = { "user": { "name": "tobi" }}
+data['attrs-data'] = { 'user': { 'name': 'tobi' } }
 
 test('cases', assert => {
-
   // assert.plan(files.length)
   files.map(file => {
-
     function onFile (assert) {
       const source = read(file + '.min')
       const m = min(source)

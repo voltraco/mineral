@@ -93,7 +93,7 @@ function html (tree, data, location, cb) {
       logical = true
 
       const parts = child.content.split(IN_RE)
-      if (!parts[0]) common.die(child.pos, 'TypeError', 'Unknown mixin')
+      if (!parts[0]) common.die(child.pos, 'TypeError', 'Not enough arguments')
 
       const object = common.scopedExpression(data, child.pos, parts[1])
 
@@ -150,7 +150,8 @@ function html (tree, data, location, cb) {
       logical = true
       const name = child.tagOrSymbol.slice(1)
       if (!global.cache[name]) {
-        common.die(child.pos, 'TypeError', 'Unknown mixin')
+        const msg = fmt('Unknown mixin (%s) in %s', name, location)
+        common.die(child.pos, 'Error', msg)
       }
 
       const locals = {}
