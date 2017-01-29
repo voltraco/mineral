@@ -33,7 +33,8 @@ function html (tree, data, location, cb) {
   }
 
   function compile (child, index) {
-    if (child.html) return child.html
+    // if (child.html) return child.html
+    const locationData = { pos: child.pos || {}, location }
 
     if (child.unescaped) {
       child.content = he.escape(child.content)
@@ -50,7 +51,7 @@ function html (tree, data, location, cb) {
       // if this is an else-if
       if (IF_RE.test(child.content)) {
         const exp = child.content.replace(IF_RE, '')
-        if (common.scopedExpression(data, child.pos, exp)) {
+        if (common.scopedExpression(data, locationData, exp)) {
           findElseBranch = false
           return html(child, data, location, cb)
         }
@@ -73,7 +74,7 @@ function html (tree, data, location, cb) {
 
     if (child.tagOrSymbol === 'if') {
       logical = true
-      if (common.scopedExpression(data, child.pos, child.content)) {
+      if (common.scopedExpression(data, locationData, child.content)) {
         return html(child, data, location, cb)
       }
       findElseBranch = true
@@ -83,7 +84,7 @@ function html (tree, data, location, cb) {
     if (child.tagOrSymbol === 'while') {
       logical = true
       let value = ''
-      while (common.scopedExpression(data, child.pos, child.content)) {
+      while (common.scopedExpression(data, locationData, child.content)) {
         value += html(child, data, location, cb)
       }
       return value
@@ -93,9 +94,9 @@ function html (tree, data, location, cb) {
       logical = true
 
       const parts = child.content.split(IN_RE)
-      if (!parts[0]) common.die(child.pos, 'TypeError', 'Not enough arguments')
+      if (!parts[0]) common.die(locationData, 'TypeError', 'Not enough arguments')
 
-      const object = common.scopedExpression(data, child.pos, parts[1])
+      const object = common.scopedExpression(data, locationData, parts[1])
 
       let value = ''
       common.each(object, function (val, key) {
@@ -116,16 +117,16 @@ function html (tree, data, location, cb) {
     }
 
     if (child.tagOrSymbol === 'each') {
-      common.die(child.pos, 'TypeError', 'Each not supported (use for)')
+      common.die(locationData, 'TypeError', 'Each not supported (use for)')
     }
 
     // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
-      return (' ' + getValue(data, child.pos, child.content))
+      return (' ' + getValue(data, locationData, child.content))
     }
 
     if (firstLetter === HYPHEN) {
-      common.die(child.pos, 'Error', 'No inline code!')
+      common.die(locationData, 'Error', 'No inline code!')
     }
 
     if (firstLetter === COLON && cb) {
@@ -137,7 +138,7 @@ function html (tree, data, location, cb) {
         t = transformer(require(resFrom('.', name)))
       } catch (ex) {
         const msg = fmt('%s could not load (%s)', name, ex.message)
-        common.die(child.pos, 'Error', msg)
+        common.die(locationData, 'Error', msg)
       }
       const path = child.content
       const data = cb({ path, location })
@@ -151,12 +152,12 @@ function html (tree, data, location, cb) {
       const name = child.tagOrSymbol.slice(1)
       if (!global.cache[name]) {
         const msg = fmt('Unknown mixin (%s) in %s', name, location)
-        common.die(child.pos, 'Error', msg)
+        common.die(locationData, 'Error', msg)
       }
 
       const locals = {}
       const args = Object.keys(child.attributes).map(attr => {
-        return common.scopedExpression(data, child.pos, attr)
+        return common.scopedExpression(data, locationData, attr)
       })
 
       global.cache[name].keys.map((k, index) => (locals[k] = args[index]))
@@ -215,7 +216,7 @@ function html (tree, data, location, cb) {
 
         if (value) {
           // all values are expressions
-          value = common.scopedExpression(data, child.pos, value)
+          value = common.scopedExpression(data, locationData, value)
 
           // a class should not be empty
           if (key === 'class' && !value) return ''
@@ -240,7 +241,7 @@ function html (tree, data, location, cb) {
     tag.push('>') // html5 doesn't care about self closing tags
 
     if (child.content) {
-      tag.push(getValue(data, child.pos, child.content))
+      tag.push(getValue(data, locationData, child.content))
     }
 
     // nothing left to decide, recurse if there are child nodes
@@ -255,7 +256,7 @@ function html (tree, data, location, cb) {
 
     var s = tag.join('')
     // if this is not a logical node, we can make an optimization
-    if (!logical) child.html = s
+    // if (!logical) child.html = s
     return s
   }
 

@@ -30,7 +30,8 @@ function dom (tree, node, data) {
   }
 
   function compile (child, index) {
-    if (child.dom) return node.appendChild(child.dom)
+    // if (child.dom) return node.appendChild(child.dom)
+    const locationData = { pos: child.pos || {}, location }
 
     if (child.unescaped) {
       child.content = he.escape(child.content)
@@ -48,7 +49,7 @@ function dom (tree, node, data) {
       // if this is an else-if
       if (IF_RE.test(child.content)) {
         const exp = child.content.replace(IF_RE, '')
-        if (common.scopedExpression(data, child.pos, exp)) {
+        if (common.scopedExpression(data, locationData, exp)) {
           findElseBranch = false
           const branch = document.createDocumentFragment()
           const children = dom(child, branch, data)
@@ -72,7 +73,7 @@ function dom (tree, node, data) {
 
     if (child.tagOrSymbol === 'if') {
       logical = true
-      if (common.scopedExpression(data, child.pos, child.content)) {
+      if (common.scopedExpression(data, locationData, child.content)) {
         const branch = document.createDocumentFragment()
         const children = dom(child, branch, data)
         if (children) node.appendChild(branch)
@@ -84,7 +85,7 @@ function dom (tree, node, data) {
 
     if (child.tagOrSymbol === 'while') {
       logical = true
-      while (common.scopedExpression(data, child.pos, child.content)) {
+      while (common.scopedExpression(data, locationData, child.content)) {
         const children = dom(child, node, data)
         if (children) node.appendChild(children)
       }
@@ -95,9 +96,9 @@ function dom (tree, node, data) {
       logical = true
 
       const parts = child.content.split(IN_RE)
-      if (!parts[0]) common.die(child.pos, 'TypeError', 'Unknown mixin')
+      if (!parts[0]) common.die(locationData, 'TypeError', 'Unknown mixin')
 
-      const object = common.scopedExpression(data, child.pos, parts[1])
+      const object = common.scopedExpression(data, locationData, parts[1])
 
       common.each(object, function (val, key) {
         // determine if there are identifiers for key and value
@@ -118,16 +119,16 @@ function dom (tree, node, data) {
     }
 
     if (child.tagOrSymbol === 'each') {
-      common.die(child.pos, 'TypeError', 'Each not supported (use for)')
+      common.die(locationData, 'TypeError', 'Each not supported (use for)')
     }
 
     // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
-      return (node.textContent += getValue(data, child.pos, child.content))
+      return (node.textContent += getValue(data, locationData, child.content))
     }
 
     if (firstLetter === HYPHEN) {
-      common.die(child.pos, 'Error', 'No inline code!')
+      common.die(locationData, 'Error', 'No inline code!')
     }
 
     /* if (firstLetter === COLON && cb) {
@@ -195,7 +196,7 @@ function dom (tree, node, data) {
 
         if (value) {
           // all values are expressions
-          value = common.scopedExpression(data, child.pos, value)
+          value = common.scopedExpression(data, locationData, value)
           // a class should not be empty
           if (key === 'class' && !value) return
 
@@ -211,7 +212,7 @@ function dom (tree, node, data) {
     }
 
     if (child.content) {
-      el.textContent += getValue(data, child.pos, child.content)
+      el.textContent += getValue(data, locationData, child.content)
     }
 
     // nothing left to decide, recurse if there are child nodes
@@ -221,7 +222,7 @@ function dom (tree, node, data) {
     }
 
     // if this is not a logical node, we can make an optimization
-    if (!logical) child.dom = el
+    // if (!logical) child.dom = el
     node.appendChild(el)
   }
 

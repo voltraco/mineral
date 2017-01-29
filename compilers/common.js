@@ -74,7 +74,7 @@ exports.resolveInclude = function resolver (info, shouldParse) {
 }
 
 exports.die = function die (info, name, message) {
-  const msg = fmt('%s:%d:%d', message, info.column, info.lineno)
+  const msg = fmt('%s:%d:%d', message, info.pos.column, info.pos.lineno)
   const err = new Error(msg)
   err.stack = ''
   err.name = name
@@ -90,7 +90,9 @@ exports.scopedExpression = function scopedExpression (data, info, str) {
   try {
     return fn.apply(data, values)
   } catch (ex) {
-    exports.die(info, ex.name, ex.message)
+    console.warn('%s: %s in %s %s:%s',
+      ex.name, ex.message, info.location, info.pos.column, info.pos.lineno)
+    return str
   }
 }
 

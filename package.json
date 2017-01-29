@@ -1,10 +1,10 @@
 {
   "name": "mineral",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "A simplified fork of the jade template langauge",
   "main": "index.js",
   "scripts": {
-    "test": "node test/mixins.js && node test/cases.js",
+    "test": "tape test/*.js",
     "build": "./node_modules/.bin/min ./docs/src/index.min -o ./docs"
   },
   "repository": {
