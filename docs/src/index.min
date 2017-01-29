@@ -4,6 +4,7 @@ html
 
   body
     header
+      img(src="/icon.svg")
       h1 mineral
     .hamburger
       .inner
