@@ -10,5 +10,15 @@ INSTALL
 npm i mineral
 
 CLI
-https://github.com/voltraco/mineral-cli
+Watch and compile mineral files https://github.com/voltraco/mineral-cli
+
+WEBPACK
+Use https://github.com/voltraco/mineral-loader to read mineral files and parse
+them into trees. This is easy, just `require('./file.min')`.
+
+BROWSERIFY
+For browserify, use the individual components.
+
+const tree = require('mineral/parser')(string)
+const el = require('mineral/compilers/dom')(tree)
 
