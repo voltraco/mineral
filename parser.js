@@ -16,7 +16,7 @@ function parseAttributes (str) {
     lexer.match.whitespace()
     const separator = lexer.match.separator()
     args[name] = value
-    //console.log('[%s] [%s] [%s] [%s]', name, delimiter, value, lexer.data())
+    // console.log('[%s] [%s] [%s] [%s]', name, delimiter, value, lexer.data())
     if (!lexer.length()) break
   }
   return args
@@ -43,7 +43,7 @@ module.exports = function Parser (source) {
         contentTarget = null
       } else {
         // add newlines and whitespace, but trim to the current indent.
-        const trimmed = whitespace.slice(contentTargetIndent + 2)
+        const trimmed = whitespace // .slice(contentTargetIndent + 2)
         contentTarget.content += trimmed + lexer.match.content(true)
         contentTarget.content += (lexer.match.newline() || '')
         continue

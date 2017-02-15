@@ -22,23 +22,30 @@ function html (tree, data, location, cb) {
   let findElseBranch = false
   let logical = false
 
-  // determine if this is a path or just regular content
   function getValue (data, info, str) {
     if (!EQ_RE.test(str)) return str
     let exp = str.replace(EQ_RE, '')
     if (FMT_RE.test(exp)) exp = '__format(' + exp + ')'
     logical = true
-    const value = common.scopedExpression(data, info, exp)
-    return he.escape(value + '')
+    return common.scopedExpression(data, info, exp)
+  }
+
+  function unescapedValue (data, info, str) {
+    return getValue(data, info, str)
+  }
+
+  // determine if this is a path or just regular content
+  function escapedValue (data, info, str) {
+    return he.escape(getValue(data, info, str) + '')
   }
 
   function compile (child, index) {
     // if (child.html) return child.html
     const locationData = { pos: child.pos || {}, location }
 
-    if (child.unescaped) {
-      child.content = he.escape(child.content)
-    }
+    // if (child.unescaped) {
+    //  child.content = child.content
+    // }
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
     //
@@ -122,7 +129,11 @@ function html (tree, data, location, cb) {
 
     // treat all piped text as plain content
     if (child.tagOrSymbol === '|') {
-      return (' ' + getValue(data, locationData, child.content))
+      return (' ' + escapedValue(data, locationData, child.content))
+    }
+
+    if (child.tagOrSymbol === '!') {
+      return (' ' + unescapedValue(data, locationData, child.content))
     }
 
     if (firstLetter === HYPHEN) {
@@ -241,7 +252,11 @@ function html (tree, data, location, cb) {
     tag.push('>') // html5 doesn't care about self closing tags
 
     if (child.content) {
-      tag.push(getValue(data, locationData, child.content))
+      const isScript = props.tagname === 'script'
+      tag.push(isScript
+        ? child.content
+        : escapedValue(data, locationData, child.content)
+      )
     }
 
     // nothing left to decide, recurse if there are child nodes

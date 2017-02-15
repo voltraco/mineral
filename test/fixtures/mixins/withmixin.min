@@ -1,4 +1,4 @@
-include ./mixin.min
+include ./fixtures/mixins/mixin.min
 
 .bazz
   +Foo

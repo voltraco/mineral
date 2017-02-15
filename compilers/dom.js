@@ -33,9 +33,9 @@ function dom (tree, node, data) {
     // if (child.dom) return node.appendChild(child.dom)
     const locationData = { pos: child.pos || {}, location }
 
-    if (child.unescaped) {
-      child.content = he.escape(child.content)
-    }
+    // if (child.unescaped) {
+    //  child.content = he.escape(child.content)
+    // }
 
     const firstLetter = child.tagOrSymbol.charCodeAt(0)
 
@@ -212,7 +212,9 @@ function dom (tree, node, data) {
     }
 
     if (child.content) {
-      el.textContent += getValue(data, locationData, child.content)
+      el.textContent = (child.tagOrSymbol === 'script')
+        ? child.content
+        : getValue(data, locationData, child.content)
     }
 
     // nothing left to decide, recurse if there are child nodes
