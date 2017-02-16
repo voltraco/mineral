@@ -8,12 +8,18 @@ test('allow text to be unescaped', assert => {
       | "test check" &amp; 'quot;
       ! "test check" &amp; 'quot;
       | "test check" &amp; 'quot;
-      ! "test check" &amp; 'quot;
+      != val
   `)
 
   assert.equal(
-    compile(m),
-    `<span> &quot;test check&quot; &amp;amp; &#x27;quot; "test check" &amp; 'quot; &quot;test check&quot; &amp;amp; &#x27;quot; "test check" &amp; 'quot;</span>`
+    compile(m, { val: `"test check" &amp; 'quot;` }),
+    `<span> ` +
+    `&quot;test check&quot; &amp;amp; &#x27;quot; ` +
+    `"test check" &amp; 'quot; ` +
+    `&quot;test check&quot; ` +
+    `&amp;amp; &#x27;quot; ` +
+    `"test check" &amp; 'quot;` +
+    `</span>`
   )
   assert.end()
 })

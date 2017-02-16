@@ -69,12 +69,6 @@ function html (tree, data, location, cb) {
       return html(child, data, location, cb)
     }
 
-    // if we are searching for an else branch, forget everything else.
-    if (findElseBranch) {
-      if (index === tree.children.length - 1) throw new Error('missing else')
-      return ''
-    }
-
     if (child.tagOrSymbol === 'comment') {
       return '<!--' + child.content + '-->'
     }
