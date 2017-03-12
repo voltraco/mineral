@@ -92,7 +92,7 @@ exports.scopedExpression = function scopedExpression (data, info, str) {
   } catch (ex) {
     console.warn('%s: %s in %s %s:%s',
       ex.name, ex.message, info.location, info.pos.column, info.pos.lineno)
-    return str
+    return ''
   }
 }
 
@@ -104,4 +104,3 @@ exports.each = function each (o, f) {
     for (let k in o) if (has.call(o, k)) f(o[k], k)
   }
 }
-

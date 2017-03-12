@@ -13,4 +13,3 @@ exports.readFileSync = f => {
   const tree = parse(source)
   return data => html(tree, data, root)
 }
-
