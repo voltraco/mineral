@@ -229,7 +229,7 @@ function html (tree, data, location, cb) {
           // data-* attributes should be escaped
           if (key.indexOf('data-') === 0) {
             if (typeof value !== 'string' && typeof value !== 'number') {
-              value = he.escape(JSON.stringify(value))
+              value = he.escape(JSON.stringify(value) + '')
             } else {
               value = '"' + value + '"'
             }
@@ -280,4 +280,3 @@ module.exports = function (tree, data, location, cb) {
   data = data || {}
   return html(tree, data, location, cb)
 }
-
